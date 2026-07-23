@@ -126,14 +126,14 @@
   .rank-entry:nth-child(5) { animation-delay: 0.5s; }
 
   .rank-entry.winner {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.3);
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
+    background: rgba(255, 200, 0, 0.08);
+    border-color: rgba(255, 200, 0, 0.35);
+    box-shadow: 0 0 20px rgba(255, 200, 0, 0.15);
   }
 
   .rank-entry.is-me {
-    border-color: rgba(168, 85, 247, 0.4);
-    background: rgba(168, 85, 247, 0.06);
+    border-color: rgba(0, 200, 255, 0.4);
+    background: rgba(0, 200, 255, 0.05);
   }
 
   .position {
@@ -171,9 +171,9 @@
   }
 
   .btn-play-again {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    background: linear-gradient(135deg, #00e676, #00b248);
     color: white;
-    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 230, 118, 0.35);
     padding: 1rem;
     font-size: 1.1rem;
   }

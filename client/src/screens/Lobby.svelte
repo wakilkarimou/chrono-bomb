@@ -160,17 +160,18 @@
   }
 
   .room-code {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    background: rgba(255, 0, 128, 0.04);
+    border: 2px solid rgba(255, 0, 128, 0.25);
     border-radius: 16px;
     padding: 1.25rem;
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     text-align: center;
   }
 
   .room-code:hover {
-    border-color: rgba(168, 85, 247, 0.6);
+    border-color: rgba(255, 0, 128, 0.5);
+    box-shadow: 0 0 20px rgba(255, 0, 128, 0.1);
   }
 
   .code-label {
@@ -185,8 +186,10 @@
     font-size: 2.8rem;
     font-weight: 800;
     letter-spacing: 0.5rem;
-    color: #a855f7;
-    text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    color: #ff0080;
+    text-shadow: 
+      0 0 8px rgba(255, 0, 128, 0.6),
+      0 0 20px rgba(255, 0, 128, 0.3);
   }
 
   .copy-hint {
@@ -223,7 +226,7 @@
   }
 
   .count {
-    color: #a855f7;
+    color: #ff0080;
   }
 
   .player-list ul {
@@ -245,8 +248,8 @@
   }
 
   .player-list li.is-me {
-    border-color: rgba(168, 85, 247, 0.3);
-    background: rgba(168, 85, 247, 0.06);
+    border-color: rgba(255, 0, 128, 0.3);
+    background: rgba(255, 0, 128, 0.05);
   }
 
   .host-badge { margin-left: 0.5rem; }
@@ -280,9 +283,9 @@
   }
 
   .btn-start {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    background: linear-gradient(135deg, #00e676, #00b248);
     color: white;
-    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 230, 118, 0.35);
     padding: 1rem;
     font-size: 1.1rem;
     width: 100%;

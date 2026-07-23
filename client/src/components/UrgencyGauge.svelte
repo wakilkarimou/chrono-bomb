@@ -12,33 +12,36 @@
 <style>
   .gauge-wrapper {
     width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
     overflow: hidden;
   }
 
   .gauge {
     height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s ease, background-color 0.5s ease;
+    border-radius: 3px;
+    transition: width 0.5s ease, background 0.5s ease, box-shadow 0.5s ease;
   }
 
   .gauge.urgency-low {
-    background: #4ade80;
+    background: linear-gradient(90deg, #00e676, #69f0ae);
+    box-shadow: 0 0 8px rgba(0, 230, 118, 0.4);
   }
 
   .gauge.urgency-medium {
-    background: #fb923c;
+    background: linear-gradient(90deg, #ff9100, #ffab40);
+    box-shadow: 0 0 12px rgba(255, 145, 0, 0.5);
   }
 
   .gauge.urgency-high {
-    background: #ef4444;
-    animation: pulse-red 0.3s infinite alternate;
+    background: linear-gradient(90deg, #ff0040, #ff5252);
+    box-shadow: 0 0 16px rgba(255, 0, 64, 0.6);
+    animation: gauge-pulse 0.25s infinite alternate;
   }
 
-  @keyframes pulse-red {
-    0% { opacity: 0.8; }
-    100% { opacity: 1; }
+  @keyframes gauge-pulse {
+    0% { box-shadow: 0 0 16px rgba(255, 0, 64, 0.6); }
+    100% { box-shadow: 0 0 24px rgba(255, 0, 64, 0.9); }
   }
 </style>

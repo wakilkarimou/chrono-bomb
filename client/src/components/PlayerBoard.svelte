@@ -49,12 +49,14 @@
   }
 
   .player-card.active {
-    border-color: #f59e0b;
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+    border-color: #ff0080;
+    box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
+    background: rgba(255, 0, 128, 0.06);
   }
 
   .player-card.is-me {
-    background: rgba(168, 85, 247, 0.08);
+    background: rgba(0, 200, 255, 0.06);
+    border-color: rgba(0, 200, 255, 0.2);
   }
 
   .player-card.eliminated {

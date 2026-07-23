@@ -133,8 +133,20 @@
 
   .title {
     font-size: 2.5rem;
-    text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+    text-shadow: 
+      0 0 10px rgba(255, 0, 128, 0.8),
+      0 0 30px rgba(255, 0, 128, 0.4),
+      0 0 60px rgba(255, 0, 128, 0.2);
     margin: 0;
+    animation: neon-flicker 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes neon-flicker {
+    0%, 95% { opacity: 1; }
+    96% { opacity: 0.85; }
+    97% { opacity: 1; }
+    98% { opacity: 0.9; }
+    100% { opacity: 1; }
   }
 
   .step-label {
@@ -197,17 +209,17 @@
   }
 
   .avatar-btn.selected {
-    border-color: #a855f7;
-    background: rgba(168, 85, 247, 0.15);
+    border-color: #ff0080;
+    background: rgba(255, 0, 128, 0.15);
     transform: scale(1.1);
   }
 
   /* Buttons */
   .btn-primary {
     width: 100%;
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    background: linear-gradient(135deg, #ff0080, #7928ca);
     color: white;
-    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.35);
     padding: 0.9rem;
     font-size: 1.05rem;
   }
@@ -238,9 +250,9 @@
 
   .btn-create {
     width: 100%;
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    background: linear-gradient(135deg, #ff0080, #7928ca);
     color: white;
-    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.35);
     padding: 1.1rem;
     font-size: 1.15rem;
   }
@@ -270,9 +282,9 @@
   }
 
   .btn-join {
-    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    background: linear-gradient(135deg, #00d4ff, #0090ff);
     color: white;
-    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 200, 255, 0.3);
     white-space: nowrap;
     padding: 0.75rem 1.25rem;
   }
