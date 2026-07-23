@@ -26,18 +26,17 @@
 </script>
 
 <div class="challenge">
-  <h3>🔄 Mot inversé !</h3>
-  <p class="hint">Remets ce mot à l'endroit :</p>
+  <h3>🔄 MOT INVERSE</h3>
   <p class="reversed-word">{reversedWord}</p>
   <div class="input-row">
     <input
       bind:value={input}
-      placeholder="Le mot à l'endroit..."
+      placeholder="Mot a l'endroit"
       maxlength="30"
       autofocus
       on:keydown={(e) => e.key === 'Enter' && submit()}
     />
-    <button on:click={submit} disabled={!input.trim()}>✓</button>
+    <button on:click={submit} disabled={!input.trim()}>OK</button>
   </div>
   <span class="timer" class:urgent={timeLeft <= 2}>{timeLeft}s</span>
 </div>
@@ -45,61 +44,58 @@
 <style>
   .challenge {
     text-align: center;
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    background: rgba(255, 0, 0, 0.03);
+    border-radius: 4px;
+    border: 2px solid rgba(255, 0, 0, 0.2);
+    width: 100%;
   }
 
   h3 {
-    margin-bottom: 0.25rem;
-    font-size: 1.1rem;
-  }
-
-  .hint {
-    font-size: 0.9rem;
-    opacity: 0.6;
-    margin-bottom: 0.75rem;
+    margin: 0 0 0.5rem 0;
+    font-size: 0.6rem;
   }
 
   .reversed-word {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #f472b6;
-    letter-spacing: 0.15rem;
-    margin-bottom: 1.25rem;
-    text-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
-    font-family: monospace;
+    font-size: 1.2rem;
+    color: #ff4444;
+    letter-spacing: 0.2rem;
+    margin: 0.75rem 0;
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
+    word-break: break-all;
   }
 
   .input-row {
     display: flex;
     gap: 0.5rem;
+    width: 100%;
   }
 
   .input-row input {
     flex: 1;
+    min-width: 0;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 0.7rem;
   }
 
   .input-row button {
-    background: #22c55e;
+    background: #cc0000;
     color: white;
+    border: 2px solid #ff0000;
     padding: 0.75rem 1rem;
-    font-size: 1.2rem;
+    font-size: 0.65rem;
+    flex-shrink: 0;
   }
 
   .timer {
     display: inline-block;
     margin-top: 0.75rem;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 0.9rem;
     opacity: 0.8;
   }
 
   .timer.urgent {
-    color: #ef4444;
+    color: #ff0000;
     animation: blink 0.5s infinite alternate;
   }
 
