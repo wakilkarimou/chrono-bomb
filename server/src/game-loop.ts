@@ -1,6 +1,6 @@
-import { INITIAL_LIVES, SECRET_TIMER_MIN, SECRET_TIMER_MAX } from './shared';
+import { INITIAL_LIVES, SECRET_TIMER_MIN, SECRET_TIMER_MAX, MODE_CONFIG } from './shared';
 import type { Room, Player } from './types';
-import type { ServerEvent } from './shared';
+import type { ServerEvent, GameMode } from './shared';
 import { generateChallenge, getChallengePublicData } from './challenges';
 import { randomInt, pickRandom } from './utils';
 
@@ -16,10 +16,11 @@ export class GameLoop {
   startGame(room: Room): void {
     const players = Array.from(room.players.values());
     const state = room.gameState;
+    const config = MODE_CONFIG[room.mode] || MODE_CONFIG.classic;
 
-    // Initialize all players with lives
+    // Initialize all players with lives based on mode
     for (const player of players) {
-      player.lives = INITIAL_LIVES;
+      player.lives = config.lives;
       player.status = 'alive';
     }
 
@@ -55,7 +56,8 @@ export class GameLoop {
 
   startSecretTimer(room: Room): void {
     const state = room.gameState;
-    const duration = randomInt(SECRET_TIMER_MIN, SECRET_TIMER_MAX);
+    const config = MODE_CONFIG[room.mode] || MODE_CONFIG.classic;
+    const duration = randomInt(config.timerMin, config.timerMax);
 
     // Clear existing timer if any
     if (state.secretTimer.timerRef) {

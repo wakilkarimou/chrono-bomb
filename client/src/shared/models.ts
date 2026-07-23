@@ -2,6 +2,7 @@ export type RoomStatus = 'waiting' | 'playing' | 'finished';
 export type PlayerStatus = 'alive' | 'spectator' | 'disconnected';
 export type ChallengeType = 'word_category' | 'reflex' | 'pattern' | 'math' | 'reverse';
 export type UrgencyLevel = 'low' | 'medium' | 'high';
+export type GameMode = 'classic' | 'speed' | 'hardcore';
 
 export interface PublicPlayer {
   id: string;

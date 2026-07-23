@@ -46,6 +46,7 @@ export class RoomStore {
 
     const room: Room = {
       code,
+      mode: 'classic',
       players: new Map([[playerId, player]]),
       gameState,
       createdAt: Date.now(),

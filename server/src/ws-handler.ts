@@ -68,7 +68,7 @@ function handleEvent(socketId: string, event: ClientEvent): void {
       handleLeaveRoom(socketId);
       break;
     case 'start_game':
-      handleStartGame(socketId);
+      handleStartGame(socketId, event.mode);
       break;
     case 'submit_challenge':
       handleSubmitChallenge(socketId, event.answer);
@@ -178,7 +178,7 @@ function handleLeaveRoom(socketId: string): void {
   removePlayerFromRoom(room, player);
 }
 
-function handleStartGame(socketId: string): void {
+function handleStartGame(socketId: string, mode: 'classic' | 'speed' | 'hardcore'): void {
   const found = roomStore.findPlayerRoom(socketId);
   if (!found) {
     sendToSocket(socketId, { type: 'error', message: 'Salon introuvable', errorCode: 'NOT_IN_ROOM' });
@@ -202,6 +202,7 @@ function handleStartGame(socketId: string): void {
     return;
   }
 
+  room.mode = mode || 'classic';
   gameLoop.startGame(room);
 }
 

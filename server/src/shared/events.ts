@@ -21,6 +21,7 @@ export interface LeaveRoomEvent {
 
 export interface StartGameEvent {
   type: 'start_game';
+  mode: 'classic' | 'speed' | 'hardcore';
 }
 
 export interface SubmitChallengeEvent {

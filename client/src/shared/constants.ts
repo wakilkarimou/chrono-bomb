@@ -7,6 +7,12 @@ export const MAX_ROOMS = 100;
 export const SECRET_TIMER_MIN = 15;
 export const SECRET_TIMER_MAX = 30;
 
+export const MODE_CONFIG = {
+  classic: { timerMin: 15, timerMax: 30, lives: 3 },
+  speed: { timerMin: 8, timerMax: 15, lives: 3 },
+  hardcore: { timerMin: 10, timerMax: 20, lives: 1 },
+} as const;
+
 export const RECONNECT_GRACE_PERIOD_MS = 10_000;
 export const HEARTBEAT_INTERVAL_MS = 5_000;
 export const HEARTBEAT_TIMEOUT_MS = 15_000;

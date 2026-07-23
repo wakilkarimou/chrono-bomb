@@ -1,4 +1,4 @@
-import type { ChallengeType, PlayerStatus, RoomStatus, UrgencyLevel } from './shared';
+import type { ChallengeType, GameMode, PlayerStatus, RoomStatus, UrgencyLevel } from './shared';
 
 export interface Player {
   id: string;
@@ -73,6 +73,7 @@ export interface GameState {
 
 export interface Room {
   code: string;
+  mode: GameMode;
   players: Map<string, Player>;
   gameState: GameState;
   createdAt: number;
