@@ -31,7 +31,7 @@ async function start() {
 
   // WebSocket route
   fastify.get('/ws', { websocket: true }, (connection, _req) => {
-    handleConnection(connection.socket);
+    handleConnection(connection.socket as unknown as import('ws').WebSocket);
   });
 
   // Health check
