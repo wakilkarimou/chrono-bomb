@@ -4,7 +4,8 @@ import {
   REFLEX_DELAY_MIN_MS,
   REFLEX_DELAY_MAX_MS,
 } from './shared';
-import type { Challenge, ChallengeType, WordChallengePayload, ReflexChallengePayload, PatternChallengePayload, MathChallengePayload, ReverseChallengePayload } from './types';
+import type { ChallengeType } from './shared';
+import type { Challenge, WordChallengePayload, ReflexChallengePayload, PatternChallengePayload, MathChallengePayload, ReverseChallengePayload } from './types';
 import { randomInt, pickRandom } from './utils';
 
 // Word categories with accepted answers
@@ -33,6 +34,8 @@ export function generateChallenge(): Challenge {
       return generateMathChallenge();
     case 'reverse':
       return generateReverseChallenge();
+    default:
+      return generateWordChallenge();
   }
 }
 
@@ -128,6 +131,8 @@ export function validateChallengeAnswer(challenge: Challenge, answer: unknown): 
       return validateMathAnswer(challenge.payload as MathChallengePayload, answer);
     case 'reverse':
       return validateReverseAnswer(challenge.payload as ReverseChallengePayload, answer);
+    default:
+      return false;
   }
 }
 
@@ -192,5 +197,7 @@ export function getChallengePublicData(challenge: Challenge) {
       const payload = challenge.payload as ReverseChallengePayload;
       return { type: challenge.type, reversedWord: payload.reversedWord };
     }
+    default:
+      return { type: challenge.type };
   }
 }

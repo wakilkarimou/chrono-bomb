@@ -37,7 +37,7 @@ export function handleConnection(ws: WebSocket): void {
   sockets.set(socketId, ws);
   heartbeats.set(socketId, Date.now());
 
-  ws.on('message', (data) => {
+  ws.on('message', (data: Buffer) => {
     try {
       const event = JSON.parse(data.toString()) as ClientEvent;
       handleEvent(socketId, event);
