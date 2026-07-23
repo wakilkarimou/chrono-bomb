@@ -7,14 +7,23 @@
   import Game from './screens/Game.svelte';
   import Podium from './screens/Podium.svelte';
 
+  // Extract ?code=XXXX from URL to pre-fill join code
+  let initialCode = '';
   onMount(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code && code.length === 4) {
+      initialCode = code.toUpperCase();
+      // Clean URL without reload
+      window.history.replaceState({}, '', window.location.pathname);
+    }
     connect();
   });
 </script>
 
 <main class="app">
   {#if $currentScreen === 'home'}
-    <Home />
+    <Home {initialCode} />
   {:else if $currentScreen === 'lobby'}
     <Lobby />
   {:else if $currentScreen === 'game'}

@@ -6,6 +6,7 @@ export type UrgencyLevel = 'low' | 'medium' | 'high';
 export interface PublicPlayer {
   id: string;
   nickname: string;
+  avatar: string;
   lives: number;
   status: PlayerStatus;
   isHost: boolean;

@@ -14,7 +14,7 @@
       class:eliminated={player.status === 'spectator'}
       class:is-me={player.id === myId}
     >
-      <span class="name">{player.nickname}</span>
+      <span class="name">{player.avatar} {player.nickname}</span>
       <div class="lives">
         {#each Array(3) as _, i}
           <span class="heart" class:lost={i >= player.lives}>

@@ -59,10 +59,10 @@ function handleEvent(socketId: string, event: ClientEvent): void {
       heartbeats.set(socketId, Date.now());
       break;
     case 'create_room':
-      handleCreateRoom(socketId, event.nickname);
+      handleCreateRoom(socketId, event.nickname, event.avatar);
       break;
     case 'join_room':
-      handleJoinRoom(socketId, event.code, event.nickname);
+      handleJoinRoom(socketId, event.code, event.nickname, event.avatar);
       break;
     case 'leave_room':
       handleLeaveRoom(socketId);
@@ -85,14 +85,14 @@ function handleEvent(socketId: string, event: ClientEvent): void {
   }
 }
 
-function handleCreateRoom(socketId: string, nickname: string): void {
+function handleCreateRoom(socketId: string, nickname: string, avatar: string): void {
   const error = validateNickname(nickname);
   if (error) {
     sendToSocket(socketId, { type: 'error', message: error, errorCode: 'INVALID_NICKNAME' });
     return;
   }
 
-  const room = roomStore.createRoom(nickname, socketId);
+  const room = roomStore.createRoom(nickname, avatar, socketId);
   if (!room) {
     sendToSocket(socketId, { type: 'error', message: 'Impossible de créer le salon', errorCode: 'ROOM_CREATION_FAILED' });
     return;
@@ -107,7 +107,7 @@ function handleCreateRoom(socketId: string, nickname: string): void {
   });
 }
 
-function handleJoinRoom(socketId: string, code: string, nickname: string): void {
+function handleJoinRoom(socketId: string, code: string, nickname: string, avatar: string): void {
   const error = validateNickname(nickname);
   if (error) {
     sendToSocket(socketId, { type: 'error', message: error, errorCode: 'INVALID_NICKNAME' });
@@ -142,6 +142,7 @@ function handleJoinRoom(socketId: string, code: string, nickname: string): void 
   const player: Player = {
     id: playerId,
     nickname,
+    avatar,
     lives: 0,
     status: 'alive',
     isHost: false,

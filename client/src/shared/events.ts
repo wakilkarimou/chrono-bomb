@@ -5,12 +5,14 @@ import type { PublicChallenge, PublicGameState, PublicPlayer, UrgencyLevel } fro
 export interface CreateRoomEvent {
   type: 'create_room';
   nickname: string;
+  avatar: string;
 }
 
 export interface JoinRoomEvent {
   type: 'join_room';
   code: string;
   nickname: string;
+  avatar: string;
 }
 
 export interface LeaveRoomEvent {

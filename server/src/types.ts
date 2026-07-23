@@ -3,6 +3,7 @@ import type { ChallengeType, PlayerStatus, RoomStatus, UrgencyLevel } from './sh
 export interface Player {
   id: string;
   nickname: string;
+  avatar: string;
   lives: number;
   status: PlayerStatus;
   isHost: boolean;

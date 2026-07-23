@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 export class RoomStore {
   private rooms: Map<string, Room> = new Map();
 
-  createRoom(nickname: string, socketId: string): Room | null {
+  createRoom(nickname: string, avatar: string, socketId: string): Room | null {
     if (this.rooms.size >= MAX_ROOMS) return null;
 
     let code: string | null = null;
@@ -23,6 +23,7 @@ export class RoomStore {
     const player: Player = {
       id: playerId,
       nickname,
+      avatar,
       lives: 0,
       status: 'alive',
       isHost: true,

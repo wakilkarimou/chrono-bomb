@@ -171,6 +171,10 @@ function handleServerEvent(event: ServerEvent): void {
     case 'bomb_passed':
       gameState.update(s => s ? { ...s, activePlayerId: event.toPlayerId, challengeResolved: false } : s);
       challengeResolved.set(false);
+      // Vibrate when you receive the bomb
+      if (event.toPlayerId === savedPlayerId && navigator.vibrate) {
+        navigator.vibrate([50, 30, 50]);
+      }
       break;
 
     case 'urgency_signal':
@@ -184,6 +188,14 @@ function handleServerEvent(event: ServerEvent): void {
           ? { ...pl, lives: event.livesRemaining, status: event.eliminated ? 'spectator' : pl.status }
           : pl
       ));
+      // Vibrate on explosion (especially if it's us)
+      if (navigator.vibrate) {
+        if (event.playerId === savedPlayerId) {
+          navigator.vibrate([100, 50, 200, 50, 300]); // strong pattern for self
+        } else {
+          navigator.vibrate(100); // light buzz for others
+        }
+      }
       // Show explosion overlay
       explosionEvent.set({
         playerId: event.playerId,

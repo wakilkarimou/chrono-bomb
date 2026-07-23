@@ -251,6 +251,7 @@ export class GameLoop {
     return {
       id: player.id,
       nickname: player.nickname,
+      avatar: player.avatar,
       lives: player.lives,
       status: player.status,
       isHost: player.isHost,
