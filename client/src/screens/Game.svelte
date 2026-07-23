@@ -23,7 +23,29 @@
   let challengeKey = 0;
   $: if (challenge) { challengeKey++; }
 
+  // Pass bomb countdown (2s)
+  let passCountdown = 2;
+  let passInterval: ReturnType<typeof setInterval> | null = null;
+
+  $: if ($challengeResolved && $isActivePlayer) {
+    passCountdown = 2;
+    if (passInterval) clearInterval(passInterval);
+    passInterval = setInterval(() => {
+      passCountdown -= 0.1;
+      if (passCountdown <= 0) {
+        if (passInterval) clearInterval(passInterval);
+        passCountdown = 0;
+      }
+    }, 100);
+  }
+
+  $: if (!$challengeResolved && passInterval) {
+    clearInterval(passInterval);
+    passInterval = null;
+  }
+
   function passBomb(targetId: string) {
+    if (passInterval) clearInterval(passInterval);
     send({ type: 'pass_bomb', targetPlayerId: targetId });
   }
 </script>
@@ -48,11 +70,14 @@
       {#if $challengeResolved}
         <!-- Pass bomb phase -->
         <div class="pass-phase">
-          <h3>✅ Défi réussi ! Passe la bombe :</h3>
+          <div class="pass-header">
+            <h3>PASSE LA BOMBE</h3>
+            <span class="pass-timer" class:urgent={passCountdown <= 0.8}>{passCountdown.toFixed(1)}s</span>
+          </div>
           <div class="pass-targets">
             {#each passTargets as target}
               <button class="btn-pass" on:click={() => passBomb(target.id)}>
-                💣→ {target.nickname}
+                {target.avatar} {target.nickname}
               </button>
             {/each}
           </div>
@@ -163,11 +188,37 @@
 
   .pass-phase {
     text-align: center;
+    width: 100%;
+  }
+
+  .pass-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
   }
 
   .pass-phase h3 {
-    margin-bottom: 1rem;
     color: #4ade80;
+    font-size: 0.6rem;
+    margin: 0;
+  }
+
+  .pass-timer {
+    font-size: 0.7rem;
+    color: #ff4444;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+
+  .pass-timer.urgent {
+    animation: blink-fast 0.2s infinite alternate;
+  }
+
+  @keyframes blink-fast {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
   }
 
   .pass-targets {

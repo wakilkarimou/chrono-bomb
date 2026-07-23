@@ -187,6 +187,10 @@ export class GameLoop {
       clearTimeout(state.urgency.signalTimerRef);
       state.urgency.signalTimerRef = null;
     }
+    if (state.passTimerRef) {
+      clearTimeout(state.passTimerRef);
+      state.passTimerRef = null;
+    }
 
     state.status = 'finished';
     state.activePlayerId = null;
@@ -223,6 +227,12 @@ export class GameLoop {
 
     const target = room.players.get(targetPlayerId);
     if (!target || target.status !== 'alive') return false;
+
+    // Cancel auto-pass timer
+    if (state.passTimerRef) {
+      clearTimeout(state.passTimerRef);
+      state.passTimerRef = null;
+    }
 
     state.activePlayerId = targetPlayerId;
     state.currentChallenge = generateChallenge();

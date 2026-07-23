@@ -69,6 +69,7 @@ export interface GameState {
   roundNumber: number;
   eliminationOrder: string[];
   challengeResolved: boolean;
+  passTimerRef: ReturnType<typeof setTimeout> | null;
 }
 
 export interface Room {

@@ -32,3 +32,4 @@ export const PATTERN_SEQUENCE_LENGTH = 3;
 export const PATTERN_DISPLAY_MS = 800;
 export const PATTERN_TIMEOUT_MS = 5_000;
 export const PATTERN_COLORS = ['red', 'blue', 'green', 'yellow'] as const;
+export const PASS_BOMB_TIMEOUT_MS = 2_000;

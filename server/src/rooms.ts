@@ -42,6 +42,7 @@ export class RoomStore {
       roundNumber: 0,
       eliminationOrder: [],
       challengeResolved: false,
+      passTimerRef: null,
     };
 
     const room: Room = {

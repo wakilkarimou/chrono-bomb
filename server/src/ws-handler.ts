@@ -1,6 +1,6 @@
 import type { WebSocket } from 'ws';
 import type { ClientEvent, ServerEvent } from './shared';
-import { MIN_PLAYERS, MAX_PLAYERS, RECONNECT_GRACE_PERIOD_MS, HEARTBEAT_TIMEOUT_MS } from './shared';
+import { MIN_PLAYERS, MAX_PLAYERS, RECONNECT_GRACE_PERIOD_MS, HEARTBEAT_TIMEOUT_MS, PASS_BOMB_TIMEOUT_MS } from './shared';
 import { roomStore } from './rooms';
 import { GameLoop } from './game-loop';
 import { validateChallengeAnswer, generateChallenge, getChallengePublicData } from './challenges';
@@ -238,6 +238,18 @@ function handleSubmitChallenge(socketId: string, answer: string | number | strin
 
   if (success) {
     state.challengeResolved = true;
+
+    // Auto-pass after 2 seconds if player doesn't choose
+    if (state.passTimerRef) clearTimeout(state.passTimerRef);
+    state.passTimerRef = setTimeout(() => {
+      if (!state.challengeResolved || state.status !== 'playing') return;
+      // Auto-pass to random player
+      const survivors = gameLoop.getSurvivors(room).filter(p => p.id !== player.id);
+      if (survivors.length > 0) {
+        const target = pickRandom(survivors);
+        gameLoop.onPassBomb(room, player.id, target.id);
+      }
+    }, PASS_BOMB_TIMEOUT_MS);
   } else {
     // Generate new challenge on failure
     state.currentChallenge = generateChallenge();
