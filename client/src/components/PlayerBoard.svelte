@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PublicPlayer } from '../shared';
+  import { killCounts } from '../lib/stores';
 
   export let players: PublicPlayer[] = [];
   export let activePlayerId: string | null = null;
@@ -22,6 +23,9 @@
           </span>
         {/each}
       </div>
+      {#if $killCounts[player.id]}
+        <span class="kill-count">🎯{$killCounts[player.id]}</span>
+      {/if}
       {#if player.id === activePlayerId}
         <span class="bomb-icon">💣</span>
       {/if}
@@ -40,7 +44,7 @@
 
   .player-card {
     position: relative;
-    padding: 0.75rem;
+    padding: 0.6rem;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 4px;
     border: 2px solid rgba(255, 255, 255, 0.08);
@@ -60,14 +64,13 @@
   }
 
   .player-card.eliminated {
-    opacity: 0.4;
+    opacity: 0.35;
     filter: grayscale(0.8);
   }
 
   .name {
     display: block;
-    font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.5rem;
     margin-bottom: 0.3rem;
     white-space: nowrap;
     overflow: hidden;
@@ -77,15 +80,23 @@
   .lives {
     display: flex;
     justify-content: center;
-    gap: 2px;
-    font-size: 0.8rem;
+    gap: 1px;
+    font-size: 0.7rem;
+  }
+
+  .kill-count {
+    display: block;
+    font-size: 0.4rem;
+    margin-top: 0.2rem;
+    opacity: 0.6;
+    color: #ff4444;
   }
 
   .bomb-icon {
     position: absolute;
     top: -8px;
     right: -8px;
-    font-size: 1.2rem;
+    font-size: 1rem;
     animation: bomb-mini-pulse 0.5s infinite alternate;
   }
 

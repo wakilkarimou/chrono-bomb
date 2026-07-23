@@ -15,6 +15,9 @@ export const errorMessage = writable<string | null>(null);
 export const rankings = writable<{ playerId: string; nickname: string; position: number }[]>([]);
 export const explosionEvent = writable<{ playerId: string; nickname: string; livesRemaining: number; eliminated: boolean } | null>(null);
 export const floatingEmojis = writable<{ id: number; emoji: string; nickname: string }[]>([]);
+export const bombPassEvent = writable<{ fromNickname: string; fromAvatar: string; toNickname: string; toAvatar: string } | null>(null);
+export const deathScreen = writable<{ nickname: string; avatar: string; position: number } | null>(null);
+export const killCounts = writable<Record<string, number>>({}); // playerId → number of "assists"
 
 export const isHost = derived(
   [playerId, players],

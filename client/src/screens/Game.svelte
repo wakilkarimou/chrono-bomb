@@ -11,6 +11,8 @@
   import PlayerBoard from '../components/PlayerBoard.svelte';
   import EmojiBar from '../components/EmojiBar.svelte';
   import EmojiOverlay from '../components/EmojiOverlay.svelte';
+  import BombPassAnimation from '../components/BombPassAnimation.svelte';
+  import DeathScreen from '../components/DeathScreen.svelte';
 
   $: challenge = $gameState?.currentChallenge;
   $: activePlayer = $players.find(p => p.id === $gameState?.activePlayerId);
@@ -102,6 +104,8 @@
 
   <EmojiBar />
   <EmojiOverlay />
+  <BombPassAnimation />
+  <DeathScreen />
 
   {#if $explosionEvent}
     <div class="explosion-overlay">

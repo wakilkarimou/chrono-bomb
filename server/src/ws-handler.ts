@@ -193,7 +193,7 @@ function handleStartGame(socketId: string, mode: 'classic' | 'speed' | 'hardcore
     return;
   }
 
-  if (room.gameState.status !== 'waiting') {
+  if (room.gameState.status !== 'waiting' && room.gameState.status !== 'finished') {
     sendToSocket(socketId, { type: 'error', message: 'Une partie est déjà en cours', errorCode: 'GAME_IN_PROGRESS' });
     return;
   }

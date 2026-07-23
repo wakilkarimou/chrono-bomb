@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { rankings, playerId, currentScreen, gameState, players, roomCode } from '../lib/stores';
+  import { rankings, playerId, currentScreen, gameState, players, roomCode, isHost, killCounts } from '../lib/stores';
   import { send } from '../lib/ws-client';
   import Confetti from '../components/Confetti.svelte';
 
@@ -7,14 +7,22 @@
   $: myRank = sorted.find(e => e.playerId === $playerId);
   $: isWinner = myRank?.position === 1;
 
+  function rematch() {
+    gameState.set(null);
+    killCounts.set({});
+    send({ type: 'start_game', mode: 'classic' });
+  }
+
   function playAgain() {
     gameState.set(null);
+    killCounts.set({});
     currentScreen.set('lobby');
   }
 
   function goHome() {
     send({ type: 'leave_room' });
     gameState.set(null);
+    killCounts.set({});
     roomCode.set(null);
     playerId.set(null);
     players.set([]);
@@ -60,11 +68,16 @@
   </div>
 
   <div class="actions">
+    {#if $isHost}
+      <button class="btn-rematch" on:click={rematch}>
+        ⚡ REVANCHE
+      </button>
+    {/if}
     <button class="btn-play-again" on:click={playAgain}>
-      🔄 Rejouer
+      🔄 RETOUR AU SALON
     </button>
     <button class="btn-home" on:click={goHome}>
-      🏠 Quitter le salon
+      QUITTER
     </button>
   </div>
 </div>
@@ -179,6 +192,21 @@
     border: 2px solid #ff0000;
     padding: 1rem;
     font-size: 0.7rem;
+  }
+
+  .btn-rematch {
+    background: #cc0000;
+    color: white;
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.5);
+    border: 2px solid #ff0000;
+    padding: 1rem;
+    font-size: 0.75rem;
+    animation: rematch-glow 1s infinite alternate;
+  }
+
+  @keyframes rematch-glow {
+    from { box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
+    to { box-shadow: 0 0 30px rgba(255, 0, 0, 0.7); }
   }
 
   .btn-home {

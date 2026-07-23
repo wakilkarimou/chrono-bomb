@@ -12,6 +12,9 @@ import {
   rankings,
   explosionEvent,
   floatingEmojis,
+  bombPassEvent,
+  deathScreen,
+  killCounts,
 } from './stores';
 
 let ws: WebSocket | null = null;
@@ -22,6 +25,7 @@ const MAX_RECONNECT = 5;
 let savedPlayerId: string | null = null;
 let savedRoomCode: string | null = null;
 let currentPlayers: import('../shared').PublicPlayer[] = [];
+let lastBombPasser: string | null = null;
 
 // Queue for messages sent before connection is ready
 let pendingMessages: ClientEvent[] = [];
@@ -144,6 +148,8 @@ function handleServerEvent(event: ServerEvent): void {
 
     case 'game_started':
       players.set(event.players);
+      killCounts.set({});
+      lastBombPasser = null;
       gameState.set({
         status: 'playing',
         activePlayerId: event.activePlayerId,
@@ -168,7 +174,23 @@ function handleServerEvent(event: ServerEvent): void {
       }
       break;
 
-    case 'bomb_passed':
+    case 'bomb_passed': {
+      // Show pass animation
+      const fromPlayer = currentPlayers.find(p => p.id === event.fromPlayerId);
+      const toPlayer = currentPlayers.find(p => p.id === event.toPlayerId);
+      if (fromPlayer && toPlayer) {
+        bombPassEvent.set({
+          fromNickname: fromPlayer.nickname,
+          fromAvatar: fromPlayer.avatar,
+          toNickname: toPlayer.nickname,
+          toAvatar: toPlayer.avatar,
+        });
+        setTimeout(() => { bombPassEvent.set(null); }, 1200);
+      }
+
+      // Track last passer for kill counting
+      lastBombPasser = event.fromPlayerId;
+
       gameState.update(s => s ? { ...s, activePlayerId: event.toPlayerId, challengeResolved: false } : s);
       challengeResolved.set(false);
       // Vibrate when you receive the bomb
@@ -176,6 +198,7 @@ function handleServerEvent(event: ServerEvent): void {
         navigator.vibrate([50, 30, 50]);
       }
       break;
+    }
 
     case 'urgency_signal':
       urgencyLevel.set(event.level);
@@ -188,14 +211,26 @@ function handleServerEvent(event: ServerEvent): void {
           ? { ...pl, lives: event.livesRemaining, status: event.eliminated ? 'spectator' : pl.status }
           : pl
       ));
-      // Vibrate on explosion (especially if it's us)
+
+      // Count kill for the last passer
+      if (lastBombPasser && lastBombPasser !== event.playerId) {
+        killCounts.update(counts => {
+          const updated = { ...counts };
+          updated[lastBombPasser!] = (updated[lastBombPasser!] || 0) + 1;
+          return updated;
+        });
+      }
+      lastBombPasser = null;
+
+      // Vibrate on explosion
       if (navigator.vibrate) {
         if (event.playerId === savedPlayerId) {
-          navigator.vibrate([100, 50, 200, 50, 300]); // strong pattern for self
+          navigator.vibrate([100, 50, 200, 50, 300]);
         } else {
-          navigator.vibrate(100); // light buzz for others
+          navigator.vibrate(100);
         }
       }
+
       // Show explosion overlay
       explosionEvent.set({
         playerId: event.playerId,
@@ -203,8 +238,22 @@ function handleServerEvent(event: ServerEvent): void {
         livesRemaining: event.livesRemaining,
         eliminated: event.eliminated,
       });
-      // Clear after 2.5s
       setTimeout(() => { explosionEvent.set(null); }, 2500);
+
+      // Show death screen if it's ME and I'm eliminated
+      if (event.playerId === savedPlayerId && event.eliminated) {
+        const totalPlayers = currentPlayers.length;
+        const aliveCount = currentPlayers.filter(p => p.id !== event.playerId && p.status === 'alive' && p.lives > 0).length;
+        const myPosition = aliveCount + 1; // I'm out, so my position is alive + 1
+        setTimeout(() => {
+          deathScreen.set({
+            nickname: explodedPlayer?.nickname || '???',
+            avatar: explodedPlayer?.avatar || '💀',
+            position: myPosition,
+          });
+        }, 2600); // After explosion overlay clears
+        setTimeout(() => { deathScreen.set(null); }, 6000);
+      }
       break;
     }
 
