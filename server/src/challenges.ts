@@ -47,10 +47,32 @@ export function generateChallenge(): Challenge {
 }
 
 function generateWordChallenge(): Challenge {
+  // Pick a category for the correct answer
   const category = pickRandom(CATEGORY_NAMES);
+  const correctAnswer = pickRandom(WORD_CATEGORIES[category]);
+
+  // Pick 3 wrong answers from OTHER categories
+  const wrongAnswers: string[] = [];
+  const otherCategories = CATEGORY_NAMES.filter(c => c !== category);
+  while (wrongAnswers.length < 3) {
+    const wrongCat = pickRandom(otherCategories);
+    const wrongWord = pickRandom(WORD_CATEGORIES[wrongCat]);
+    if (wrongWord !== correctAnswer && !wrongAnswers.includes(wrongWord)) {
+      wrongAnswers.push(wrongWord);
+    }
+  }
+
+  // Shuffle options
+  const options = [correctAnswer, ...wrongAnswers];
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+
   const payload: WordChallengePayload = {
     category,
-    acceptedWords: WORD_CATEGORIES[category],
+    options,
+    correctAnswer,
   };
   return { type: 'word_category', payload, generatedAt: Date.now() };
 }
@@ -103,7 +125,25 @@ function generateMathChallenge(): Challenge {
   }
 
   const expression = `${a} ${op} ${b}`;
-  const payload: MathChallengePayload = { expression, answer };
+
+  // Generate 3 wrong options close to the correct answer
+  const wrongOptions = new Set<number>();
+  while (wrongOptions.size < 3) {
+    const offset = randomInt(1, 10) * (Math.random() > 0.5 ? 1 : -1);
+    const wrong = answer + offset;
+    if (wrong !== answer && wrong > 0 && !wrongOptions.has(wrong)) {
+      wrongOptions.add(wrong);
+    }
+  }
+
+  const options = [answer, ...wrongOptions];
+  // Shuffle
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+
+  const payload: MathChallengePayload = { expression, answer, options };
   return { type: 'math', payload, generatedAt: Date.now() };
 }
 
@@ -145,9 +185,7 @@ export function validateChallengeAnswer(challenge: Challenge, answer: unknown): 
 
 function validateWordAnswer(payload: WordChallengePayload, answer: unknown): boolean {
   if (typeof answer !== 'string') return false;
-  const trimmed = answer.toLowerCase().trim();
-  if (trimmed.length === 0 || trimmed.length > 30) return false;
-  return payload.acceptedWords.includes(trimmed);
+  return answer.toLowerCase().trim() === payload.correctAnswer.toLowerCase();
 }
 
 function validateReflexAnswer(payload: ReflexChallengePayload, answer: unknown): boolean {
@@ -186,7 +224,7 @@ export function getChallengePublicData(challenge: Challenge) {
   switch (challenge.type) {
     case 'word_category': {
       const payload = challenge.payload as WordChallengePayload;
-      return { type: challenge.type, category: payload.category };
+      return { type: challenge.type, category: payload.category, options: payload.options };
     }
     case 'reflex': {
       const payload = challenge.payload as ReflexChallengePayload;
@@ -198,7 +236,7 @@ export function getChallengePublicData(challenge: Challenge) {
     }
     case 'math': {
       const payload = challenge.payload as MathChallengePayload;
-      return { type: challenge.type, expression: payload.expression };
+      return { type: challenge.type, expression: payload.expression, mathOptions: payload.options };
     }
     case 'reverse': {
       const payload = challenge.payload as ReverseChallengePayload;

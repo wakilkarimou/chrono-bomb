@@ -14,11 +14,13 @@ export interface PublicPlayer {
 export interface PublicChallenge {
   type: ChallengeType;
   category?: string;
+  options?: string[];       // QCM choices for word_category
   delay?: number;
   sequence?: string[];
   colors?: string[];
-  expression?: string;    // pour math (ex: "7 × 8")
-  reversedWord?: string;  // pour reverse (ex: "ENISUIC")
+  expression?: string;
+  mathOptions?: number[];   // QCM choices for math
+  reversedWord?: string;
 }
 
 export interface PublicGameState {

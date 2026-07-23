@@ -60,13 +60,13 @@
         <div class="challenge-phase">
           {#key challengeKey}
             {#if challenge.type === 'word_category'}
-              <WordChallenge category={challenge.category || ''} />
+              <WordChallenge category={challenge.category || ''} options={challenge.options || []} />
             {:else if challenge.type === 'reflex'}
               <ReflexChallenge delay={challenge.delay || 2000} />
             {:else if challenge.type === 'pattern'}
               <PatternChallenge sequence={challenge.sequence || []} colors={challenge.colors || []} />
             {:else if challenge.type === 'math'}
-              <MathChallenge expression={challenge.expression || ''} />
+              <MathChallenge expression={challenge.expression || ''} mathOptions={challenge.mathOptions || []} />
             {:else if challenge.type === 'reverse'}
               <ReverseChallenge reversedWord={challenge.reversedWord || ''} />
             {/if}

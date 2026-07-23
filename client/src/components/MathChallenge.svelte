@@ -1,44 +1,33 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
   import { send } from '../lib/ws-client';
 
   export let expression: string;
+  export let mathOptions: number[] = [];
 
-  let input = '';
-  let timeLeft = 5;
+  let selected: number | null = null;
 
-  const timer = setInterval(() => {
-    timeLeft--;
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      send({ type: 'submit_challenge', answer: '' });
-    }
-  }, 1000);
-
-  onDestroy(() => clearInterval(timer));
-
-  function submit() {
-    if (!input.trim()) return;
-    clearInterval(timer);
-    send({ type: 'submit_challenge', answer: input.trim() });
-    input = '';
+  function choose(option: number) {
+    if (selected !== null) return;
+    selected = option;
+    send({ type: 'submit_challenge', answer: option.toString() });
   }
 </script>
 
 <div class="challenge">
   <h3>🧮 Calcul rapide !</h3>
   <p class="expression">{expression} = ?</p>
-  <div class="input-row">
-    <input
-      bind:value={input}
-      placeholder="Réponse"
-      type="number"
-      autofocus
-      on:keydown={(e) => e.key === 'Enter' && submit()}
-    />
-    <button on:click={submit} disabled={!input.trim()}>✓</button>
+  <div class="options">
+    {#each mathOptions as option}
+      <button
+        class="option-btn"
+        class:selected={selected === option}
+        disabled={selected !== null}
+        on:click={() => choose(option)}
+      >
+        {option}
+      </button>
+    {/each}
   </div>
-  <span class="timer" class:urgent={timeLeft <= 2}>{timeLeft}s</span>
 </div>
 
 <style>
@@ -59,52 +48,53 @@
     font-size: 2.2rem;
     font-weight: 800;
     color: #38bdf8;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
   }
 
-  .input-row {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
   }
 
-  .input-row input {
-    width: 120px;
-    text-align: center;
-    font-size: 1.5rem;
+  .option-btn {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f0e6ff;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    padding: 1rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    -moz-appearance: textfield;
+    transition: all 0.15s;
+    min-height: 55px;
   }
 
-  .input-row input::-webkit-outer-spin-button,
-  .input-row input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  .option-btn:hover:not(:disabled) {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: rgba(56, 189, 248, 0.4);
   }
 
-  .input-row button {
-    background: #22c55e;
-    color: white;
-    padding: 0.75rem 1rem;
-    font-size: 1.2rem;
+  .option-btn:active:not(:disabled) {
+    transform: scale(0.95);
   }
 
-  .timer {
-    display: inline-block;
-    margin-top: 0.75rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    opacity: 0.8;
+  .option-btn.selected {
+    background: rgba(56, 189, 248, 0.3);
+    border-color: #38bdf8;
   }
 
-  .timer.urgent {
-    color: #ef4444;
-    animation: blink 0.5s infinite alternate;
+  .option-btn:disabled:not(.selected) {
+    opacity: 0.4;
   }
 
-  @keyframes blink {
-    0% { opacity: 0.5; }
-    100% { opacity: 1; }
+  @media (max-width: 480px) {
+    .expression {
+      font-size: 1.8rem;
+    }
+
+    .option-btn {
+      padding: 1.1rem;
+      font-size: 1.3rem;
+    }
   }
 </style>

@@ -14,7 +14,8 @@ export interface Player {
 
 export interface WordChallengePayload {
   category: string;
-  acceptedWords: string[];
+  options: string[];       // 4 choices displayed to the player
+  correctAnswer: string;   // the one that belongs to the category
 }
 
 export interface ReflexChallengePayload {
@@ -30,6 +31,7 @@ export interface PatternChallengePayload {
 export interface MathChallengePayload {
   expression: string;   // ex: "7 × 8"
   answer: number;       // ex: 56
+  options: number[];    // 4 choices including the correct one
 }
 
 export interface ReverseChallengePayload {

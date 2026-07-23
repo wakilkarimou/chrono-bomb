@@ -1,44 +1,33 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
   import { send } from '../lib/ws-client';
 
   export let category: string;
+  export let options: string[] = [];
 
-  let input = '';
-  let timeLeft = 5;
+  let selected: string | null = null;
 
-  const timer = setInterval(() => {
-    timeLeft--;
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      send({ type: 'submit_challenge', answer: '' });
-    }
-  }, 1000);
-
-  onDestroy(() => clearInterval(timer));
-
-  function submit() {
-    if (!input.trim()) return;
-    clearInterval(timer);
-    send({ type: 'submit_challenge', answer: input.trim() });
-    input = '';
+  function choose(option: string) {
+    if (selected) return;
+    selected = option;
+    send({ type: 'submit_challenge', answer: option });
   }
 </script>
 
 <div class="challenge">
-  <h3>🏷️ Trouve un mot :</h3>
+  <h3>🏷️ Quel mot appartient à :</h3>
   <p class="category">{category}</p>
-  <div class="input-row">
-    <input
-      bind:value={input}
-      placeholder="Tape un mot..."
-      maxlength="30"
-      autofocus
-      on:keydown={(e) => e.key === 'Enter' && submit()}
-    />
-    <button on:click={submit} disabled={!input.trim()}>✓</button>
+  <div class="options">
+    {#each options as option}
+      <button
+        class="option-btn"
+        class:selected={selected === option}
+        disabled={selected !== null}
+        on:click={() => choose(option)}
+      >
+        {option}
+      </button>
+    {/each}
   </div>
-  <span class="timer" class:urgent={timeLeft <= 2}>{timeLeft}s</span>
 </div>
 
 <style>
@@ -60,40 +49,53 @@
     font-weight: 700;
     color: #a855f7;
     text-transform: capitalize;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
   }
 
-  .input-row {
-    display: flex;
-    gap: 0.5rem;
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
   }
 
-  .input-row input {
-    flex: 1;
+  .option-btn {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f0e6ff;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    padding: 1rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    transition: all 0.15s;
+    min-height: 50px;
   }
 
-  .input-row button {
-    background: #22c55e;
-    color: white;
-    padding: 0.75rem 1rem;
-    font-size: 1.2rem;
+  .option-btn:hover:not(:disabled) {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.4);
   }
 
-  .timer {
-    display: inline-block;
-    margin-top: 0.75rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    opacity: 0.8;
+  .option-btn:active:not(:disabled) {
+    transform: scale(0.95);
   }
 
-  .timer.urgent {
-    color: #ef4444;
-    animation: blink 0.5s infinite alternate;
+  .option-btn.selected {
+    background: rgba(168, 85, 247, 0.3);
+    border-color: #a855f7;
   }
 
-  @keyframes blink {
-    0% { opacity: 0.5; }
-    100% { opacity: 1; }
+  .option-btn:disabled:not(.selected) {
+    opacity: 0.4;
+  }
+
+  @media (max-width: 480px) {
+    .options {
+      grid-template-columns: 1fr;
+    }
+
+    .option-btn {
+      padding: 1.1rem;
+      font-size: 1.1rem;
+    }
   }
 </style>
