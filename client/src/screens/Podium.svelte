@@ -77,6 +77,8 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    flex: 1;
+    justify-content: center;
   }
 
   .result-header {

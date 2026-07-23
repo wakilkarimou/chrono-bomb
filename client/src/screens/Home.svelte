@@ -35,7 +35,7 @@
 </script>
 
 <div class="home">
-  <h1 class="title">💣 Chrono-Bomb</h1>
+  <h1 class="title">CHRONO-BOMB</h1>
 
   {#if showRules}
     <div class="rules-panel">
@@ -129,16 +129,19 @@
     flex-direction: column;
     align-items: center;
     gap: 1.25rem;
+    flex: 1;
+    justify-content: center;
   }
 
   .title {
-    font-size: 1.6rem;
+    font-size: clamp(0.9rem, 5vw, 1.6rem);
     text-shadow: 
       0 0 10px rgba(255, 0, 0, 0.8),
       0 0 30px rgba(255, 0, 0, 0.4),
       0 0 60px rgba(255, 0, 0, 0.2);
     margin: 0;
     color: #ff0000;
+    white-space: nowrap;
     animation: neon-flicker 3s ease-in-out infinite alternate;
   }
 
@@ -331,8 +334,10 @@
   }
 
   @media (max-width: 480px) {
-    .title {
-      font-size: 2rem;
+    .home {
+      gap: 1rem;
+      max-width: 100%;
+      padding: 0 0.25rem;
     }
 
     .avatar-grid {
@@ -341,6 +346,10 @@
 
     .join-row {
       flex-direction: column;
+    }
+
+    .code-input {
+      font-size: 1rem;
     }
   }
 </style>

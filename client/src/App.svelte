@@ -63,6 +63,7 @@
     min-height: 100dvh;
     padding: 1rem;
     padding-bottom: env(safe-area-inset-bottom, 1rem);
+    width: 100%;
   }
 
   /* Dark background with subtle red glow */
@@ -153,9 +154,9 @@
 
   @media (max-width: 480px) {
     .app {
-      padding: 0.75rem;
-      justify-content: flex-start;
-      padding-top: 2rem;
+      padding: 0.5rem;
+      padding-top: 1rem;
+      justify-content: center;
     }
   }
 </style>

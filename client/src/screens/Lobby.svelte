@@ -123,6 +123,8 @@
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    flex: 1;
+    justify-content: center;
   }
 
   .header {
