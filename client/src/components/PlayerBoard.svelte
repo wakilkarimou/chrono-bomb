@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PublicPlayer } from '../shared';
   import { killCounts } from '../lib/stores';
+  import Avatar from './Avatar.svelte';
 
   export let players: PublicPlayer[] = [];
   export let activePlayerId: string | null = null;
@@ -15,7 +16,7 @@
       class:eliminated={player.status === 'spectator'}
       class:is-me={player.id === myId}
     >
-      <span class="name">{player.avatar} {player.nickname}</span>
+      <span class="name"><Avatar avatarId={player.avatar} size="18px" /> {player.nickname}</span>
       <div class="lives">
         {#each Array(3) as _, i}
           <span class="heart" class:lost={i >= player.lives}>
@@ -69,12 +70,15 @@
   }
 
   .name {
-    display: block;
-    font-size: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.45rem;
     margin-bottom: 0.3rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    justify-content: center;
   }
 
   .lives {

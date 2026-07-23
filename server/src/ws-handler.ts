@@ -407,7 +407,7 @@ function removePlayerFromRoom(room: Room, player: Player): void {
 }
 
 // Allowed emojis for rate limiting / validation
-const ALLOWED_EMOJIS = ['😂', '💀', '🔥', '😱', '👀', '💣', '🎉', '😈', '🤡', '❤️', '👏', '😭'];
+const ALLOWED_EMOJIS = ['laugh', 'skull-react', 'fire', 'scared', 'eyes', 'clap', 'rip', 'crown-react'];
 
 function handleSendEmoji(socketId: string, emoji: string): void {
   if (!ALLOWED_EMOJIS.includes(emoji)) return;

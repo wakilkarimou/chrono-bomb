@@ -1,6 +1,8 @@
 <script lang="ts">
   import { send, connected } from '../lib/ws-client';
   import { errorMessage, roomCode } from '../lib/stores';
+  import { AVATARS } from '../lib/avatars';
+  import Avatar from '../components/Avatar.svelte';
   import type { GameMode } from '../shared';
 
   export let initialCode = '';
@@ -10,11 +12,9 @@
 
   let nickname = '';
   let joinCode = initialCode;
-  let selectedAvatar = '🐱';
+  let selectedAvatar = 'skull';
   let selectedMode: GameMode = 'classic';
   let showRules = false;
-
-  const avatars = ['🐱', '🦊', '🐸', '🦁', '🐼', '🐵', '🐷', '🦄', '🐲', '🦈', '🐙', '🦅'];
 
   const modes: { id: GameMode; name: string; icon: string; desc: string }[] = [
     { id: 'classic', name: 'CLASSIQUE', icon: '💣', desc: '3 vies, chrono 15-30s. Le mode standard pour tous.' },
@@ -67,7 +67,9 @@
     <p class="step-label">TON IDENTITE</p>
 
     <div class="identity-card">
-      <div class="avatar-preview">{selectedAvatar}</div>
+      <div class="avatar-preview">
+        <Avatar avatarId={selectedAvatar} size="36px" />
+      </div>
       <input
         bind:value={nickname}
         placeholder="Pseudo"
@@ -78,13 +80,16 @@
     </div>
 
     <div class="avatar-grid">
-      {#each avatars as av}
+      {#each AVATARS as av}
         <button
           class="avatar-btn"
-          class:selected={selectedAvatar === av}
-          on:click={() => selectedAvatar = av}
+          class:selected={selectedAvatar === av.id}
+          on:click={() => selectedAvatar = av.id}
           type="button"
-        >{av}</button>
+          style="border-color: {selectedAvatar === av.id ? av.color : 'rgba(255,255,255,0.08)'}"
+        >
+          {@html av.svg}
+        </button>
       {/each}
     </div>
 
@@ -99,7 +104,10 @@
     <button class="btn-link" on:click={() => showRules = true}>REGLES DU JEU</button>
 
   {:else if step === 'action'}
-    <button class="btn-back" on:click={goBack}>← {selectedAvatar} {nickname}</button>
+    <button class="btn-back" on:click={goBack}>
+      <span class="back-avatar"><Avatar avatarId={selectedAvatar} size="20px" /></span>
+      ← {nickname}
+    </button>
 
     <div class="action-buttons">
       <button class="btn-create" on:click={goToMode}>
@@ -209,15 +217,11 @@
   }
 
   .avatar-preview {
-    font-size: 1.8rem;
     width: 44px;
     height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 0, 0, 0.08);
-    border-radius: 4px;
-    border: 1px solid rgba(255, 0, 0, 0.3);
     flex-shrink: 0;
   }
 
@@ -239,9 +243,8 @@
   }
 
   .avatar-btn {
-    font-size: 1.3rem;
     aspect-ratio: 1;
-    padding: 0;
+    padding: 4px;
     background: rgba(255, 255, 255, 0.03);
     border: 2px solid rgba(255, 255, 255, 0.08);
     border-radius: 4px;
@@ -251,10 +254,15 @@
     transition: all 0.12s;
   }
 
+  .avatar-btn :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
   .avatar-btn.selected {
-    border-color: #ff0000;
-    background: rgba(255, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.08);
     transform: scale(1.1);
+    box-shadow: 0 0 8px currentColor;
   }
 
   /* Buttons */
@@ -286,6 +294,13 @@
     padding: 0.4rem 0.6rem;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .back-avatar {
+    display: flex;
   }
 
   /* Action step */

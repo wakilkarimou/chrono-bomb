@@ -1,26 +1,28 @@
 <script lang="ts">
   import { send } from '../lib/ws-client';
-
-  const emojis = ['😂', '💀', '🔥', '😱', '👀', '💣', '🎉', '😈', '🤡', '❤️', '👏', '😭'];
+  import { REACTION_EMOTES } from '../lib/avatars';
 
   let cooldown = false;
 
-  function sendEmoji(emoji: string) {
+  function sendEmoji(id: string) {
     if (cooldown) return;
-    send({ type: 'send_emoji', emoji });
+    send({ type: 'send_emoji', emoji: id });
     cooldown = true;
     setTimeout(() => { cooldown = false; }, 500);
   }
 </script>
 
 <div class="emoji-bar">
-  {#each emojis as emoji}
+  {#each REACTION_EMOTES as emote}
     <button
-      class="emoji-btn"
+      class="emote-btn"
       class:disabled={cooldown}
-      on:click={() => sendEmoji(emoji)}
+      on:click={() => sendEmoji(emote.id)}
       disabled={cooldown}
-    >{emoji}</button>
+      title={emote.label}
+    >
+      {@html emote.svg}
+    </button>
   {/each}
 </div>
 
@@ -30,42 +32,41 @@
     gap: 0.25rem;
     flex-wrap: wrap;
     justify-content: center;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.4rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  .emoji-btn {
+  .emote-btn {
     background: none;
-    border: none;
-    font-size: 1.4rem;
-    padding: 0.3rem 0.4rem;
-    border-radius: 8px;
-    min-height: 38px;
-    min-width: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    padding: 4px;
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: transform 0.1s, background 0.1s;
   }
 
-  .emoji-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.3);
+  .emote-btn :global(svg) {
+    width: 22px;
+    height: 22px;
   }
 
-  .emoji-btn:active:not(:disabled) {
+  .emote-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.2);
+  }
+
+  .emote-btn:active:not(:disabled) {
     transform: scale(0.9);
   }
 
-  .emoji-btn:disabled {
-    opacity: 0.4;
-  }
-
-  @media (max-width: 480px) {
-    .emoji-btn {
-      font-size: 1.2rem;
-      min-height: 34px;
-      min-width: 34px;
-      padding: 0.2rem 0.3rem;
-    }
+  .emote-btn:disabled {
+    opacity: 0.3;
   }
 </style>

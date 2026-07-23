@@ -1,11 +1,17 @@
 <script lang="ts">
   import { floatingEmojis } from '../lib/stores';
+  import { REACTION_EMOTES } from '../lib/avatars';
+
+  function getEmoteSvg(id: string): string {
+    const emote = REACTION_EMOTES.find(e => e.id === id);
+    return emote?.svg || `<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="#666"/></svg>`;
+  }
 </script>
 
 <div class="emoji-overlay">
   {#each $floatingEmojis as item (item.id)}
     <div class="floating-emoji" style="left: {15 + Math.random() * 70}%">
-      <span class="emoji">{item.emoji}</span>
+      <span class="emote-icon">{@html getEmoteSvg(item.emoji)}</span>
       <span class="name">{item.nickname}</span>
     </div>
   {/each}
@@ -29,17 +35,24 @@
     animation: float-up 2s ease-out forwards;
   }
 
-  .emoji {
-    font-size: 2.5rem;
+  .emote-icon {
+    display: block;
+    width: 36px;
+    height: 36px;
+  }
+
+  .emote-icon :global(svg) {
+    width: 100%;
+    height: 100%;
   }
 
   .name {
-    font-size: 0.7rem;
+    font-size: 0.4rem;
     opacity: 0.7;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    margin-top: 0.2rem;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+    margin-top: 0.15rem;
     white-space: nowrap;
   }
 
@@ -52,7 +65,7 @@
       opacity: 1;
     }
     100% {
-      transform: translateY(-60vh) scale(0.6);
+      transform: translateY(-50vh) scale(0.6);
       opacity: 0;
     }
   }

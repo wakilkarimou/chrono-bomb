@@ -2,6 +2,7 @@
   import { send } from '../lib/ws-client';
   import { players, roomCode, isHost, errorMessage, currentScreen, playerId } from '../lib/stores';
   import { MIN_PLAYERS, MAX_PLAYERS } from '../shared';
+  import Avatar from '../components/Avatar.svelte';
 
   let copied = false;
   let shareSupported = typeof navigator.share === 'function';
@@ -78,7 +79,7 @@
       {#each $players as player}
         <li class:is-me={player.id === $playerId}>
           <span class="player-name">
-            <span class="avatar">{player.avatar}</span>
+            <Avatar avatarId={player.avatar} size="24px" />
             {player.nickname}
             {#if player.isHost}
               <span class="host-badge">👑</span>
@@ -256,9 +257,11 @@
 
   .host-badge { margin-left: 0.5rem; }
 
-  .avatar {
-    margin-right: 0.5rem;
-    font-size: 1.2rem;
+  .player-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.55rem;
   }
 
   .you-badge {
