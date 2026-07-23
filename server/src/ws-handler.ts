@@ -79,6 +79,9 @@ function handleEvent(socketId: string, event: ClientEvent): void {
     case 'reconnect':
       handleReconnect(socketId, event.playerId, event.roomCode);
       break;
+    case 'send_emoji':
+      handleSendEmoji(socketId, event.emoji);
+      break;
   }
 }
 
@@ -385,6 +388,25 @@ function removePlayerFromRoom(room: Room, player: Player): void {
     type: 'player_left',
     playerId: player.id,
     newHostId,
+  });
+}
+
+// Allowed emojis for rate limiting / validation
+const ALLOWED_EMOJIS = ['😂', '💀', '🔥', '😱', '👀', '💣', '🎉', '😈', '🤡', '❤️', '👏', '😭'];
+
+function handleSendEmoji(socketId: string, emoji: string): void {
+  if (!ALLOWED_EMOJIS.includes(emoji)) return;
+
+  const found = roomStore.findPlayerRoom(socketId);
+  if (!found) return;
+
+  const { room, player } = found;
+
+  broadcastToRoom(room, {
+    type: 'emoji_received',
+    playerId: player.id,
+    nickname: player.nickname,
+    emoji,
   });
 }
 

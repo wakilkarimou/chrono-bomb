@@ -41,6 +41,11 @@ export interface ReconnectEvent {
   roomCode: string;
 }
 
+export interface SendEmojiEvent {
+  type: 'send_emoji';
+  emoji: string;
+}
+
 export type ClientEvent =
   | CreateRoomEvent
   | JoinRoomEvent
@@ -49,7 +54,8 @@ export type ClientEvent =
   | SubmitChallengeEvent
   | PassBombEvent
   | HeartbeatEvent
-  | ReconnectEvent;
+  | ReconnectEvent
+  | SendEmojiEvent;
 
 // ========== Server → Client ==========
 
@@ -142,6 +148,13 @@ export interface ServerErrorEvent {
   errorCode: string;
 }
 
+export interface EmojiReceivedEvent {
+  type: 'emoji_received';
+  playerId: string;
+  nickname: string;
+  emoji: string;
+}
+
 export type ServerEvent =
   | RoomCreatedEvent
   | RoomJoinedEvent
@@ -157,4 +170,5 @@ export type ServerEvent =
   | GameOverEvent
   | PlayerDisconnectedEvent
   | ReconnectedEvent
-  | ServerErrorEvent;
+  | ServerErrorEvent
+  | EmojiReceivedEvent;

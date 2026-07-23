@@ -14,6 +14,7 @@ export const challengeResolved = writable<boolean>(false);
 export const errorMessage = writable<string | null>(null);
 export const rankings = writable<{ playerId: string; nickname: string; position: number }[]>([]);
 export const explosionEvent = writable<{ playerId: string; nickname: string; livesRemaining: number; eliminated: boolean } | null>(null);
+export const floatingEmojis = writable<{ id: number; emoji: string; nickname: string }[]>([]);
 
 export const isHost = derived(
   [playerId, players],

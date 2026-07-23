@@ -9,6 +9,8 @@
   import BombAnimation from '../components/BombAnimation.svelte';
   import UrgencyGauge from '../components/UrgencyGauge.svelte';
   import PlayerBoard from '../components/PlayerBoard.svelte';
+  import EmojiBar from '../components/EmojiBar.svelte';
+  import EmojiOverlay from '../components/EmojiOverlay.svelte';
 
   $: challenge = $gameState?.currentChallenge;
   $: activePlayer = $players.find(p => p.id === $gameState?.activePlayerId);
@@ -97,6 +99,9 @@
   </div>
 
   <PlayerBoard players={$players} activePlayerId={$gameState?.activePlayerId || null} myId={$playerId} />
+
+  <EmojiBar />
+  <EmojiOverlay />
 
   {#if $explosionEvent}
     <div class="explosion-overlay">

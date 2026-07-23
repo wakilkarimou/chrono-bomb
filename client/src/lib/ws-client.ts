@@ -11,6 +11,7 @@ import {
   errorMessage,
   rankings,
   explosionEvent,
+  floatingEmojis,
 } from './stores';
 
 let ws: WebSocket | null = null;
@@ -229,5 +230,15 @@ function handleServerEvent(event: ServerEvent): void {
     case 'error':
       errorMessage.set(event.message);
       break;
+
+    case 'emoji_received': {
+      const emojiId = Date.now() + Math.random();
+      floatingEmojis.update(list => [...list, { id: emojiId, emoji: event.emoji, nickname: event.nickname }]);
+      // Remove after animation
+      setTimeout(() => {
+        floatingEmojis.update(list => list.filter(e => e.id !== emojiId));
+      }, 2000);
+      break;
+    }
   }
 }

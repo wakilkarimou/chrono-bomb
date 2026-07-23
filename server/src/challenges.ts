@@ -10,11 +10,18 @@ import { randomInt, pickRandom } from './utils';
 
 // Word categories with accepted answers
 const WORD_CATEGORIES: Record<string, string[]> = {
-  animaux: ['chat', 'chien', 'lion', 'tigre', 'ours', 'loup', 'aigle', 'serpent', 'cheval', 'vache', 'poule', 'canard', 'requin', 'dauphin', 'baleine', 'elephant', 'girafe', 'singe', 'lapin', 'souris', 'rat', 'cochon', 'mouton', 'chevre', 'cerf', 'renard', 'hibou', 'tortue', 'grenouille', 'crocodile'],
-  fruits: ['pomme', 'banane', 'orange', 'fraise', 'cerise', 'raisin', 'poire', 'peche', 'mangue', 'ananas', 'kiwi', 'citron', 'melon', 'pasteque', 'abricot', 'prune', 'figue', 'noix', 'framboise', 'myrtille'],
-  pays: ['france', 'espagne', 'italie', 'allemagne', 'portugal', 'japon', 'chine', 'inde', 'bresil', 'canada', 'mexique', 'australie', 'egypte', 'maroc', 'suisse', 'belgique', 'suede', 'grece', 'turquie', 'russie'],
-  couleurs: ['rouge', 'bleu', 'vert', 'jaune', 'orange', 'violet', 'rose', 'noir', 'blanc', 'gris', 'marron', 'turquoise', 'beige', 'doré', 'argenté'],
-  sports: ['football', 'tennis', 'basket', 'rugby', 'natation', 'cyclisme', 'boxe', 'judo', 'ski', 'surf', 'golf', 'handball', 'volleyball', 'athletisme', 'escalade', 'karate', 'escrime', 'equitation'],
+  animaux: ['chat', 'chien', 'lion', 'tigre', 'ours', 'loup', 'aigle', 'serpent', 'cheval', 'vache', 'poule', 'canard', 'requin', 'dauphin', 'baleine', 'elephant', 'girafe', 'singe', 'lapin', 'souris', 'rat', 'cochon', 'mouton', 'chevre', 'cerf', 'renard', 'hibou', 'tortue', 'grenouille', 'crocodile', 'panthère', 'perroquet', 'pingouin', 'koala', 'panda', 'hamster', 'aigle', 'flamant', 'gorille', 'hippopotame'],
+  fruits: ['pomme', 'banane', 'orange', 'fraise', 'cerise', 'raisin', 'poire', 'peche', 'mangue', 'ananas', 'kiwi', 'citron', 'melon', 'pasteque', 'abricot', 'prune', 'figue', 'noix', 'framboise', 'myrtille', 'litchi', 'grenade', 'coco', 'papaye', 'cassis'],
+  pays: ['france', 'espagne', 'italie', 'allemagne', 'portugal', 'japon', 'chine', 'inde', 'bresil', 'canada', 'mexique', 'australie', 'egypte', 'maroc', 'suisse', 'belgique', 'suede', 'grece', 'turquie', 'russie', 'argentine', 'colombie', 'coree', 'vietnam', 'irlande', 'norvege', 'pologne', 'thailande'],
+  couleurs: ['rouge', 'bleu', 'vert', 'jaune', 'orange', 'violet', 'rose', 'noir', 'blanc', 'gris', 'marron', 'turquoise', 'beige', 'doré', 'argenté', 'cyan', 'magenta', 'indigo', 'corail', 'bordeaux'],
+  sports: ['football', 'tennis', 'basket', 'rugby', 'natation', 'cyclisme', 'boxe', 'judo', 'ski', 'surf', 'golf', 'handball', 'volleyball', 'athletisme', 'escalade', 'karate', 'escrime', 'equitation', 'badminton', 'hockey', 'cricket', 'baseball', 'plongee', 'aviron'],
+  films: ['avatar', 'titanic', 'inception', 'matrix', 'interstellar', 'gladiator', 'batman', 'joker', 'parasite', 'alien', 'predator', 'rocky', 'rambo', 'terminator', 'shrek', 'frozen', 'coco', 'ratatouille', 'up', 'cars', 'nemo', 'spider-man', 'avengers', 'deadpool'],
+  nourriture: ['pizza', 'burger', 'sushi', 'pates', 'riz', 'poulet', 'salade', 'soupe', 'crepe', 'gateau', 'tarte', 'quiche', 'sandwich', 'tacos', 'kebab', 'curry', 'ramen', 'couscous', 'fondue', 'gratin', 'omelette', 'croissant', 'baguette', 'frites'],
+  villes: ['paris', 'londres', 'tokyo', 'new-york', 'rome', 'berlin', 'madrid', 'lisbonne', 'amsterdam', 'bangkok', 'dubai', 'sydney', 'montreal', 'istanbul', 'prague', 'vienne', 'oslo', 'dublin', 'seoul', 'miami', 'rio', 'barcelone', 'venise', 'marrakech'],
+  'jeux vidéo': ['minecraft', 'fortnite', 'zelda', 'mario', 'tetris', 'pokemon', 'fifa', 'gta', 'overwatch', 'valorant', 'league', 'skyrim', 'halo', 'sonic', 'pacman', 'sims', 'roblox', 'apex', 'cod', 'diablo', 'elden-ring', 'cyberpunk', 'destiny', 'fallout'],
+  métiers: ['medecin', 'avocat', 'pompier', 'policier', 'boulanger', 'cuisinier', 'pilote', 'professeur', 'ingenieur', 'architecte', 'plombier', 'electricien', 'dentiste', 'infirmier', 'journaliste', 'acteur', 'musicien', 'photographe', 'coiffeur', 'boucher', 'serveur', 'chauffeur', 'facteur', 'astronaute'],
+  marques: ['nike', 'adidas', 'apple', 'samsung', 'google', 'amazon', 'coca', 'pepsi', 'netflix', 'spotify', 'tesla', 'bmw', 'toyota', 'ikea', 'zara', 'gucci', 'puma', 'playstation', 'xbox', 'nintendo', 'disney', 'lego', 'chanel', 'rolex'],
+  instruments: ['piano', 'guitare', 'violon', 'batterie', 'flute', 'saxophone', 'trompette', 'harpe', 'accordeon', 'ukulele', 'basse', 'clarinette', 'trombone', 'orgue', 'banjo', 'harmonica', 'xylophone', 'djembe', 'contrebasse', 'mandoline'],
 };
 
 const CATEGORY_NAMES = Object.keys(WORD_CATEGORIES);
