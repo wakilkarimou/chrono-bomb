@@ -2,20 +2,12 @@
   import { send } from '../lib/ws-client';
   import { players, roomCode, isHost, errorMessage, currentScreen, playerId } from '../lib/stores';
   import { MIN_PLAYERS, MAX_PLAYERS } from '../shared';
-  import type { GameMode } from '../shared';
 
   let copied = false;
   let shareSupported = typeof navigator.share === 'function';
-  let selectedMode: GameMode = 'classic';
-
-  const modes = [
-    { id: 'classic' as GameMode, name: 'CLASSIQUE', icon: '💣', desc: '3 vies · 15-30s' },
-    { id: 'speed' as GameMode, name: 'SPEED', icon: '⚡', desc: '3 vies · 8-15s' },
-    { id: 'hardcore' as GameMode, name: 'HARDCORE', icon: '💀', desc: '1 vie · 10-20s' },
-  ];
 
   function startGame() {
-    send({ type: 'start_game', mode: selectedMode });
+    send({ type: 'start_game', mode: 'classic' });
   }
 
   function leaveRoom() {
@@ -105,26 +97,8 @@
 
   <div class="actions">
     {#if $isHost}
-      <div class="mode-selector">
-        <h3>Mode de jeu</h3>
-        <div class="mode-grid">
-          {#each modes as mode}
-            <button
-              class="mode-btn"
-              class:selected={selectedMode === mode.id}
-              on:click={() => selectedMode = mode.id}
-              type="button"
-            >
-              <span class="mode-icon">{mode.icon}</span>
-              <span class="mode-name">{mode.name}</span>
-              <span class="mode-desc">{mode.desc}</span>
-            </button>
-          {/each}
-        </div>
-      </div>
-
       <button class="btn-start" on:click={startGame} disabled={$players.length < MIN_PLAYERS}>
-        🚀 Lancer la partie
+        LANCER LA PARTIE
       </button>
       {#if $players.length < MIN_PLAYERS}
         <p class="hint-text">Il faut au moins {MIN_PLAYERS} joueur{MIN_PLAYERS > 1 ? 's' : ''}</p>
@@ -354,56 +328,6 @@
     color: #fca5a5;
     font-size: 0.9rem;
     text-align: center;
-  }
-
-  .mode-selector {
-    width: 100%;
-    text-align: center;
-  }
-
-  .mode-selector h3 {
-    font-size: 0.6rem;
-    opacity: 0.6;
-    margin-bottom: 0.6rem;
-    text-transform: uppercase;
-  }
-
-  .mode-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
-  }
-
-  .mode-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-    padding: 0.6rem 0.3rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    transition: all 0.15s;
-  }
-
-  .mode-btn.selected {
-    border-color: #ff0000;
-    background: rgba(255, 0, 0, 0.08);
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
-  }
-
-  .mode-icon {
-    font-size: 1.3rem;
-  }
-
-  .mode-name {
-    font-size: 0.45rem;
-    color: #fff;
-  }
-
-  .mode-desc {
-    font-size: 0.4rem;
-    opacity: 0.5;
   }
 
   @keyframes pulse {

@@ -6,6 +6,7 @@ export interface CreateRoomEvent {
   type: 'create_room';
   nickname: string;
   avatar: string;
+  mode: 'classic' | 'speed' | 'hardcore';
 }
 
 export interface JoinRoomEvent {

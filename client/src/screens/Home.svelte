@@ -1,30 +1,43 @@
 <script lang="ts">
   import { send, connected } from '../lib/ws-client';
   import { errorMessage, roomCode } from '../lib/stores';
+  import type { GameMode } from '../shared';
 
   export let initialCode = '';
 
-  type Step = 'identity' | 'action';
+  type Step = 'identity' | 'action' | 'mode';
   let step: Step = 'identity';
 
   let nickname = '';
   let joinCode = initialCode;
   let selectedAvatar = '🐱';
+  let selectedMode: GameMode = 'classic';
   let showRules = false;
 
   const avatars = ['🐱', '🦊', '🐸', '🦁', '🐼', '🐵', '🐷', '🦄', '🐲', '🦈', '🐙', '🦅'];
+
+  const modes: { id: GameMode; name: string; icon: string; desc: string }[] = [
+    { id: 'classic', name: 'CLASSIQUE', icon: '💣', desc: '3 vies, chrono 15-30s. Le mode standard pour tous.' },
+    { id: 'speed', name: 'SPEED', icon: '⚡', desc: '3 vies, chrono 8-15s. Pas le temps de réfléchir !' },
+    { id: 'hardcore', name: 'HARDCORE', icon: '💀', desc: '1 seule vie, chrono 10-20s. Zéro droit à l\'erreur.' },
+  ];
 
   function goToAction() {
     if (!nickname.trim()) return;
     step = 'action';
   }
 
+  function goToMode() {
+    step = 'mode';
+  }
+
   function goBack() {
-    step = 'identity';
+    if (step === 'mode') { step = 'action'; }
+    else if (step === 'action') { step = 'identity'; }
   }
 
   function createRoom() {
-    send({ type: 'create_room', nickname: nickname.trim(), avatar: selectedAvatar });
+    send({ type: 'create_room', nickname: nickname.trim(), avatar: selectedAvatar, mode: selectedMode });
   }
 
   function joinRoom() {
@@ -39,26 +52,25 @@
 
   {#if showRules}
     <div class="rules-panel">
-      <h3>📖 Comment jouer</h3>
+      <h3>REGLES</h3>
       <ol>
-        <li>Crée un salon ou rejoins avec un code</li>
+        <li>Cree un salon ou rejoins avec un code</li>
         <li>Une bombe tourne entre les joueurs</li>
-        <li>Résous un défi rapide pour la passer</li>
-        <li>Chrono secret : quand il expire → 💥 -1 vie</li>
-        <li>Dernier survivant = 🏆</li>
+        <li>Resous un defi rapide pour la passer</li>
+        <li>Chrono secret : quand il expire → -1 vie</li>
+        <li>Dernier survivant = victoire</li>
       </ol>
-      <button class="btn-primary" on:click={() => showRules = false}>Compris !</button>
+      <button class="btn-primary" on:click={() => showRules = false}>COMPRIS</button>
     </div>
 
   {:else if step === 'identity'}
-    <!-- Step 1: Who are you? -->
-    <p class="step-label">Choisis ton identité</p>
+    <p class="step-label">TON IDENTITE</p>
 
     <div class="identity-card">
       <div class="avatar-preview">{selectedAvatar}</div>
       <input
         bind:value={nickname}
-        placeholder="Ton pseudo"
+        placeholder="Pseudo"
         maxlength="16"
         autocomplete="off"
         on:keydown={(e) => e.key === 'Enter' && goToAction()}
@@ -78,25 +90,24 @@
 
     <button class="btn-primary" on:click={goToAction} disabled={!nickname.trim() || !$connected}>
       {#if !$connected}
-        ⏳ Connexion...
+        CONNEXION...
       {:else}
-        Continuer →
+        CONTINUER
       {/if}
     </button>
 
-    <button class="btn-link" on:click={() => showRules = true}>📖 Comment jouer ?</button>
+    <button class="btn-link" on:click={() => showRules = true}>REGLES DU JEU</button>
 
-  {:else}
-    <!-- Step 2: What do you want to do? -->
+  {:else if step === 'action'}
     <button class="btn-back" on:click={goBack}>← {selectedAvatar} {nickname}</button>
 
     <div class="action-buttons">
-      <button class="btn-create" on:click={createRoom}>
-        🎮 Créer un salon
+      <button class="btn-create" on:click={goToMode}>
+        CREER UN SALON
       </button>
 
       <div class="join-section">
-        <p class="join-label">Rejoindre un salon</p>
+        <p class="join-label">REJOINDRE UN SALON</p>
         <div class="join-row">
           <input
             bind:value={joinCode}
@@ -108,11 +119,37 @@
             on:keydown={(e) => e.key === 'Enter' && joinRoom()}
           />
           <button class="btn-join" on:click={joinRoom} disabled={joinCode.length !== 4}>
-            Rejoindre
+            GO
           </button>
         </div>
       </div>
     </div>
+
+  {:else if step === 'mode'}
+    <button class="btn-back" on:click={goBack}>← RETOUR</button>
+
+    <p class="step-label">CHOISIS LE MODE</p>
+
+    <div class="mode-list">
+      {#each modes as mode}
+        <button
+          class="mode-card"
+          class:selected={selectedMode === mode.id}
+          on:click={() => selectedMode = mode.id}
+          type="button"
+        >
+          <div class="mode-header">
+            <span class="mode-icon">{mode.icon}</span>
+            <span class="mode-name">{mode.name}</span>
+          </div>
+          <p class="mode-desc">{mode.desc}</p>
+        </button>
+      {/each}
+    </div>
+
+    <button class="btn-primary" on:click={createRoom}>
+      LANCER EN {modes.find(m => m.id === selectedMode)?.name}
+    </button>
   {/if}
 
   {#if $errorMessage}
@@ -128,17 +165,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1rem;
     flex: 1;
     justify-content: center;
   }
 
   .title {
-    font-size: clamp(0.9rem, 5vw, 1.6rem);
+    font-size: clamp(0.9rem, 5vw, 1.5rem);
     text-shadow: 
       0 0 10px rgba(255, 0, 0, 0.8),
-      0 0 30px rgba(255, 0, 0, 0.4),
-      0 0 60px rgba(255, 0, 0, 0.2);
+      0 0 30px rgba(255, 0, 0, 0.4);
     margin: 0;
     color: #ff0000;
     white-space: nowrap;
@@ -154,9 +190,10 @@
   }
 
   .step-label {
-    opacity: 0.6;
-    font-size: 0.9rem;
+    opacity: 0.5;
+    font-size: 0.55rem;
     margin: 0;
+    letter-spacing: 0.1em;
   }
 
   /* Identity card */
@@ -172,13 +209,13 @@
   }
 
   .avatar-preview {
-    font-size: 2rem;
-    width: 48px;
-    height: 48px;
+    font-size: 1.8rem;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 0, 0, 0.1);
+    background: rgba(255, 0, 0, 0.08);
     border-radius: 4px;
     border: 1px solid rgba(255, 0, 0, 0.3);
     flex-shrink: 0;
@@ -189,33 +226,34 @@
     border: none;
     background: none;
     padding: 0.5rem;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    min-width: 0;
   }
 
   /* Avatar grid */
   .avatar-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 0.4rem;
+    gap: 0.35rem;
     width: 100%;
   }
 
   .avatar-btn {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     aspect-ratio: 1;
     padding: 0;
     background: rgba(255, 255, 255, 0.03);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.08);
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s;
+    transition: all 0.12s;
   }
 
   .avatar-btn.selected {
     border-color: #ff0000;
-    background: rgba(255, 0, 0, 0.15);
+    background: rgba(255, 0, 0, 0.12);
     transform: scale(1.1);
   }
 
@@ -224,29 +262,33 @@
     width: 100%;
     background: #cc0000;
     color: white;
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    padding: 0.9rem;
-    font-size: 0.7rem;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.35);
+    padding: 0.85rem;
+    font-size: 0.6rem;
     border: 2px solid #ff0000;
   }
 
   .btn-link {
     background: none;
-    color: rgba(240, 230, 255, 0.5);
-    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.5rem;
     padding: 0.4rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0;
   }
 
   .btn-back {
     align-self: flex-start;
-    background: rgba(255, 255, 255, 0.06);
-    color: #f0e6ff;
-    font-size: 0.9rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  /* Action buttons */
+  /* Action step */
   .action-buttons {
     width: 100%;
     display: flex;
@@ -258,9 +300,9 @@
     width: 100%;
     background: #cc0000;
     color: white;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    padding: 1.1rem;
-    font-size: 0.75rem;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.35);
+    padding: 1rem;
+    font-size: 0.65rem;
     border: 2px solid #ff0000;
   }
 
@@ -269,21 +311,20 @@
   }
 
   .join-label {
-    font-size: 0.85rem;
-    opacity: 0.5;
-    margin-bottom: 0.6rem;
+    font-size: 0.5rem;
+    opacity: 0.4;
+    margin-bottom: 0.5rem;
   }
 
   .join-row {
     display: flex;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .code-input {
     flex: 1;
     text-align: center;
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 1rem;
     letter-spacing: 0.3rem;
     text-transform: uppercase;
   }
@@ -291,18 +332,65 @@
   .btn-join {
     background: #1a1a1a;
     color: #ff4444;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     border: 2px solid #ff0000;
     white-space: nowrap;
-    padding: 0.75rem 1.25rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.6rem;
+  }
+
+  /* Mode selection step */
+  .mode-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mode-card {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    transition: all 0.12s;
+  }
+
+  .mode-card.selected {
+    border-color: #ff0000;
+    background: rgba(255, 0, 0, 0.06);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.15);
+  }
+
+  .mode-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .mode-icon {
+    font-size: 1.2rem;
+  }
+
+  .mode-name {
+    font-size: 0.55rem;
+    color: #fff;
+  }
+
+  .mode-desc {
+    font-size: 0.45rem;
+    opacity: 0.5;
+    line-height: 1.6;
+    margin: 0;
   }
 
   /* Rules */
   .rules-panel {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 1.25rem;
+    background: rgba(255, 0, 0, 0.03);
+    border: 2px solid rgba(255, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 1rem;
     text-align: left;
     width: 100%;
   }
@@ -310,7 +398,8 @@
   .rules-panel h3 {
     text-align: center;
     margin-bottom: 0.75rem;
-    font-size: 1.1rem;
+    font-size: 0.6rem;
+    color: #ff0000;
   }
 
   .rules-panel ol {
@@ -318,38 +407,29 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    opacity: 0.85;
+    font-size: 0.5rem;
+    line-height: 1.6;
+    opacity: 0.7;
   }
 
   .error {
     width: 100%;
-    padding: 0.7rem;
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 8px;
-    color: #fca5a5;
-    font-size: 0.85rem;
+    padding: 0.6rem;
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 4px;
+    color: #ff6666;
+    font-size: 0.5rem;
   }
 
   @media (max-width: 480px) {
     .home {
-      gap: 1rem;
       max-width: 100%;
       padding: 0 0.25rem;
     }
 
-    .avatar-grid {
-      grid-template-columns: repeat(6, 1fr);
-    }
-
     .join-row {
       flex-direction: column;
-    }
-
-    .code-input {
-      font-size: 1rem;
     }
   }
 </style>

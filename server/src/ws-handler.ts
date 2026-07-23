@@ -59,7 +59,7 @@ function handleEvent(socketId: string, event: ClientEvent): void {
       heartbeats.set(socketId, Date.now());
       break;
     case 'create_room':
-      handleCreateRoom(socketId, event.nickname, event.avatar);
+      handleCreateRoom(socketId, event.nickname, event.avatar, event.mode);
       break;
     case 'join_room':
       handleJoinRoom(socketId, event.code, event.nickname, event.avatar);
@@ -85,14 +85,15 @@ function handleEvent(socketId: string, event: ClientEvent): void {
   }
 }
 
-function handleCreateRoom(socketId: string, nickname: string, avatar: string): void {
+function handleCreateRoom(socketId: string, nickname: string, avatar: string, mode: string): void {
   const error = validateNickname(nickname);
   if (error) {
     sendToSocket(socketId, { type: 'error', message: error, errorCode: 'INVALID_NICKNAME' });
     return;
   }
 
-  const room = roomStore.createRoom(nickname, avatar, socketId);
+  const validMode = (['classic', 'speed', 'hardcore'].includes(mode) ? mode : 'classic') as 'classic' | 'speed' | 'hardcore';
+  const room = roomStore.createRoom(nickname, avatar, socketId, validMode);
   if (!room) {
     sendToSocket(socketId, { type: 'error', message: 'Impossible de créer le salon', errorCode: 'ROOM_CREATION_FAILED' });
     return;
@@ -202,7 +203,7 @@ function handleStartGame(socketId: string, mode: 'classic' | 'speed' | 'hardcore
     return;
   }
 
-  room.mode = mode || 'classic';
+  room.mode = room.mode || 'classic';
   gameLoop.startGame(room);
 }
 
