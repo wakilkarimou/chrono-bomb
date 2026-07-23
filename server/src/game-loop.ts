@@ -139,7 +139,12 @@ export class GameLoop {
     if (survivors.length <= 1) {
       this.endGame(room, survivors[0] || null);
     } else {
-      this.startNewRound(room, survivors);
+      // Short delay before new round so clients show explosion feedback
+      setTimeout(() => {
+        if (room.gameState.status === 'playing') {
+          this.startNewRound(room, this.getSurvivors(room));
+        }
+      }, 2000);
     }
   }
 

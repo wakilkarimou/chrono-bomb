@@ -194,4 +194,15 @@
     color: #fca5a5;
     font-size: 0.9rem;
   }
+
+  @media (max-width: 480px) {
+    .code-value {
+      font-size: 2.5rem;
+      letter-spacing: 0.4rem;
+    }
+
+    .room-code {
+      padding: 1rem;
+    }
+  }
 </style>

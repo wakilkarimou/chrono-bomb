@@ -1,6 +1,6 @@
 <script lang="ts">
   import { send } from '../lib/ws-client';
-  import { players, playerId, gameState, isActivePlayer, urgencyLevel, challengeResolved, alivePlayers } from '../lib/stores';
+  import { players, playerId, gameState, isActivePlayer, urgencyLevel, challengeResolved, alivePlayers, explosionEvent } from '../lib/stores';
   import WordChallenge from '../components/WordChallenge.svelte';
   import ReflexChallenge from '../components/ReflexChallenge.svelte';
   import PatternChallenge from '../components/PatternChallenge.svelte';
@@ -13,6 +13,11 @@
   $: challenge = $gameState?.currentChallenge;
   $: activePlayer = $players.find(p => p.id === $gameState?.activePlayerId);
   $: passTargets = $alivePlayers.filter(p => p.id !== $playerId);
+
+  // Unique key that changes every time a new challenge is assigned
+  // Forces Svelte to destroy and recreate the challenge component
+  let challengeKey = 0;
+  $: if (challenge) { challengeKey++; }
 
   function passBomb(targetId: string) {
     send({ type: 'pass_bomb', targetPlayerId: targetId });
@@ -51,17 +56,19 @@
       {:else if challenge}
         <!-- Challenge phase -->
         <div class="challenge-phase">
-          {#if challenge.type === 'word_category'}
-            <WordChallenge category={challenge.category || ''} />
-          {:else if challenge.type === 'reflex'}
-            <ReflexChallenge delay={challenge.delay || 2000} />
-          {:else if challenge.type === 'pattern'}
-            <PatternChallenge sequence={challenge.sequence || []} colors={challenge.colors || []} />
-          {:else if challenge.type === 'math'}
-            <MathChallenge expression={challenge.expression || ''} />
-          {:else if challenge.type === 'reverse'}
-            <ReverseChallenge reversedWord={challenge.reversedWord || ''} />
-          {/if}
+          {#key challengeKey}
+            {#if challenge.type === 'word_category'}
+              <WordChallenge category={challenge.category || ''} />
+            {:else if challenge.type === 'reflex'}
+              <ReflexChallenge delay={challenge.delay || 2000} />
+            {:else if challenge.type === 'pattern'}
+              <PatternChallenge sequence={challenge.sequence || []} colors={challenge.colors || []} />
+            {:else if challenge.type === 'math'}
+              <MathChallenge expression={challenge.expression || ''} />
+            {:else if challenge.type === 'reverse'}
+              <ReverseChallenge reversedWord={challenge.reversedWord || ''} />
+            {/if}
+          {/key}
         </div>
       {/if}
     {:else}
@@ -90,6 +97,22 @@
   </div>
 
   <PlayerBoard players={$players} activePlayerId={$gameState?.activePlayerId || null} myId={$playerId} />
+
+  {#if $explosionEvent}
+    <div class="explosion-overlay">
+      <div class="explosion-content">
+        <span class="explosion-emoji">💥</span>
+        <p class="explosion-text">
+          {$explosionEvent.nickname} a explosé !
+        </p>
+        {#if $explosionEvent.eliminated}
+          <p class="elimination-text">☠️ Éliminé !</p>
+        {:else}
+          <p class="lives-text">❤️ {$explosionEvent.livesRemaining} vie{$explosionEvent.livesRemaining > 1 ? 's' : ''} restante{$explosionEvent.livesRemaining > 1 ? 's' : ''}</p>
+        {/if}
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -172,5 +195,92 @@
     border-radius: 12px;
     font-size: 0.95rem;
     opacity: 0.7;
+  }
+
+  @media (max-width: 480px) {
+    .game {
+      gap: 0.75rem;
+    }
+
+    .game-content {
+      min-height: 200px;
+    }
+
+    .pass-targets {
+      flex-direction: column;
+    }
+
+    .btn-pass {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .spectator-view {
+      padding: 1rem;
+    }
+
+    .watching {
+      font-size: 1.1rem;
+    }
+  }
+
+  .explosion-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fade-in 0.15s ease-out;
+  }
+
+  .explosion-content {
+    text-align: center;
+    animation: explosion-pop 0.3s ease-out;
+  }
+
+  .explosion-emoji {
+    font-size: 5rem;
+    display: block;
+    animation: shake-big 0.4s ease-out;
+  }
+
+  .explosion-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 1rem;
+  }
+
+  .elimination-text {
+    font-size: 1.2rem;
+    color: #ef4444;
+    margin-top: 0.5rem;
+  }
+
+  .lives-text {
+    font-size: 1.2rem;
+    color: #fb923c;
+    margin-top: 0.5rem;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes explosion-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes shake-big {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
   }
 </style>

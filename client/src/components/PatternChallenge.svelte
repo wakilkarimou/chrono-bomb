@@ -110,7 +110,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
-    max-width: 250px;
+    max-width: 280px;
     margin: 0 auto;
   }
 
@@ -121,6 +121,8 @@
     border: 3px solid rgba(255, 255, 255, 0.2);
     transition: all 0.2s;
     padding: 0;
+    min-height: 70px;
+    touch-action: manipulation;
   }
 
   .color-btn:not(:disabled):hover {

@@ -10,6 +10,7 @@ import {
   challengeResolved,
   errorMessage,
   rankings,
+  explosionEvent,
 } from './stores';
 
 let ws: WebSocket | null = null;
@@ -19,6 +20,7 @@ const MAX_RECONNECT = 5;
 
 let savedPlayerId: string | null = null;
 let savedRoomCode: string | null = null;
+let currentPlayers: import('../shared').PublicPlayer[] = [];
 
 // Queue for messages sent before connection is ready
 let pendingMessages: ClientEvent[] = [];
@@ -29,6 +31,7 @@ export const connected = writable<boolean>(false);
 // Subscribe to stores to keep local refs
 playerId.subscribe(v => { savedPlayerId = v; });
 roomCode.subscribe(v => { savedRoomCode = v; });
+players.subscribe(v => { currentPlayers = v; });
 
 export function connect(): void {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -173,16 +176,27 @@ function handleServerEvent(event: ServerEvent): void {
       urgencyLevel.set(event.level);
       break;
 
-    case 'bomb_exploded':
+    case 'bomb_exploded': {
+      const explodedPlayer = currentPlayers.find(p => p.id === event.playerId);
       players.update(p => p.map(pl =>
         pl.id === event.playerId
           ? { ...pl, lives: event.livesRemaining, status: event.eliminated ? 'spectator' : pl.status }
           : pl
       ));
+      // Show explosion overlay
+      explosionEvent.set({
+        playerId: event.playerId,
+        nickname: explodedPlayer?.nickname || '???',
+        livesRemaining: event.livesRemaining,
+        eliminated: event.eliminated,
+      });
+      // Clear after 2.5s
+      setTimeout(() => { explosionEvent.set(null); }, 2500);
       break;
+    }
 
     case 'new_round':
-      gameState.update(s => s ? { ...s, roundNumber: event.roundNumber, activePlayerId: event.activePlayerId, challengeResolved: false } : s);
+      gameState.update(s => s ? { ...s, roundNumber: event.roundNumber, activePlayerId: event.activePlayerId, challengeResolved: false, currentChallenge: null } : s);
       urgencyLevel.set('low');
       challengeResolved.set(false);
       break;

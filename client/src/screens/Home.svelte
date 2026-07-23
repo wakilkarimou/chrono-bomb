@@ -164,4 +164,18 @@
     0%, 100% { opacity: 0.4; }
     50% { opacity: 0.8; }
   }
+
+  @media (max-width: 480px) {
+    .title {
+      font-size: 2.2rem;
+    }
+
+    .join-group {
+      flex-direction: column;
+    }
+
+    .code-input {
+      font-size: 1.5rem;
+    }
+  }
 </style>
