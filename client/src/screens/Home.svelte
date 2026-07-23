@@ -132,12 +132,13 @@
   }
 
   .title {
-    font-size: 2.5rem;
+    font-size: 1.6rem;
     text-shadow: 
-      0 0 10px rgba(255, 0, 128, 0.8),
-      0 0 30px rgba(255, 0, 128, 0.4),
-      0 0 60px rgba(255, 0, 128, 0.2);
+      0 0 10px rgba(255, 0, 0, 0.8),
+      0 0 30px rgba(255, 0, 0, 0.4),
+      0 0 60px rgba(255, 0, 0, 0.2);
     margin: 0;
+    color: #ff0000;
     animation: neon-flicker 3s ease-in-out infinite alternate;
   }
 
@@ -161,9 +162,9 @@
     align-items: center;
     gap: 0.75rem;
     width: 100%;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 14px;
+    background: rgba(255, 0, 0, 0.03);
+    border: 2px solid rgba(255, 0, 0, 0.2);
+    border-radius: 4px;
     padding: 0.6rem 0.75rem;
   }
 
@@ -174,8 +175,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(168, 85, 247, 0.1);
-    border-radius: 12px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
     flex-shrink: 0;
   }
 
@@ -184,7 +186,7 @@
     border: none;
     background: none;
     padding: 0.5rem;
-    font-size: 1.1rem;
+    font-size: 0.75rem;
   }
 
   /* Avatar grid */
@@ -199,9 +201,9 @@
     font-size: 1.4rem;
     aspect-ratio: 1;
     padding: 0;
-    background: rgba(255, 255, 255, 0.04);
-    border: 2px solid transparent;
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -209,19 +211,20 @@
   }
 
   .avatar-btn.selected {
-    border-color: #ff0080;
-    background: rgba(255, 0, 128, 0.15);
+    border-color: #ff0000;
+    background: rgba(255, 0, 0, 0.15);
     transform: scale(1.1);
   }
 
   /* Buttons */
   .btn-primary {
     width: 100%;
-    background: linear-gradient(135deg, #ff0080, #7928ca);
+    background: #cc0000;
     color: white;
-    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.35);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 0.9rem;
-    font-size: 1.05rem;
+    font-size: 0.7rem;
+    border: 2px solid #ff0000;
   }
 
   .btn-link {
@@ -250,11 +253,12 @@
 
   .btn-create {
     width: 100%;
-    background: linear-gradient(135deg, #ff0080, #7928ca);
+    background: #cc0000;
     color: white;
-    box-shadow: 0 4px 20px rgba(255, 0, 128, 0.35);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 1.1rem;
-    font-size: 1.15rem;
+    font-size: 0.75rem;
+    border: 2px solid #ff0000;
   }
 
   .join-section {
@@ -282,9 +286,10 @@
   }
 
   .btn-join {
-    background: linear-gradient(135deg, #00d4ff, #0090ff);
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 200, 255, 0.3);
+    background: #1a1a1a;
+    color: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    border: 2px solid #ff0000;
     white-space: nowrap;
     padding: 0.75rem 1.25rem;
   }

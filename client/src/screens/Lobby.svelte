@@ -160,9 +160,9 @@
   }
 
   .room-code {
-    background: rgba(255, 0, 128, 0.04);
-    border: 2px solid rgba(255, 0, 128, 0.25);
-    border-radius: 16px;
+    background: rgba(255, 0, 0, 0.03);
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 4px;
     padding: 1.25rem;
     cursor: pointer;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -170,8 +170,8 @@
   }
 
   .room-code:hover {
-    border-color: rgba(255, 0, 128, 0.5);
-    box-shadow: 0 0 20px rgba(255, 0, 128, 0.1);
+    border-color: #ff0000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.15);
   }
 
   .code-label {
@@ -183,13 +183,13 @@
 
   .code-value {
     display: block;
-    font-size: 2.8rem;
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: 0.5rem;
-    color: #ff0080;
+    color: #ff0000;
     text-shadow: 
-      0 0 8px rgba(255, 0, 128, 0.6),
-      0 0 20px rgba(255, 0, 128, 0.3);
+      0 0 8px rgba(255, 0, 0, 0.6),
+      0 0 20px rgba(255, 0, 0, 0.3);
   }
 
   .copy-hint {
@@ -226,7 +226,7 @@
   }
 
   .count {
-    color: #ff0080;
+    color: #ff0000;
   }
 
   .player-list ul {
@@ -248,8 +248,8 @@
   }
 
   .player-list li.is-me {
-    border-color: rgba(255, 0, 128, 0.3);
-    background: rgba(255, 0, 128, 0.05);
+    border-color: rgba(255, 0, 0, 0.3);
+    background: rgba(255, 0, 0, 0.05);
   }
 
   .host-badge { margin-left: 0.5rem; }
@@ -283,11 +283,12 @@
   }
 
   .btn-start {
-    background: linear-gradient(135deg, #00e676, #00b248);
+    background: #cc0000;
     color: white;
-    box-shadow: 0 4px 20px rgba(0, 230, 118, 0.35);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+    border: 2px solid #ff0000;
     padding: 1rem;
-    font-size: 1.1rem;
+    font-size: 0.7rem;
     width: 100%;
   }
 

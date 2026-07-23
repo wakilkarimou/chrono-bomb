@@ -42,8 +42,8 @@
   :global(body) {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #0a0a1a;
+    font-family: 'Press Start 2P', monospace;
+    background: #0a0a0a;
     color: #ffffff;
     min-height: 100dvh;
     overflow-x: hidden;
@@ -65,85 +65,75 @@
     padding-bottom: env(safe-area-inset-bottom, 1rem);
   }
 
-  /* Animated gradient background */
+  /* Dark background with subtle red glow */
   .app::before {
     content: '';
     position: fixed;
     inset: 0;
     background: 
-      radial-gradient(ellipse at 20% 50%, rgba(255, 0, 128, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, rgba(0, 200, 255, 0.1) 0%, transparent 50%),
-      linear-gradient(180deg, #0a0a1a 0%, #12062e 50%, #0a1628 100%);
-    animation: bg-shift 12s ease-in-out infinite alternate;
+      radial-gradient(ellipse at 50% 0%, rgba(200, 0, 0, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(150, 0, 0, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 60%, rgba(100, 0, 0, 0.06) 0%, transparent 50%),
+      #0a0a0a;
     z-index: -2;
   }
 
-  /* Floating particles overlay */
+  /* Scanline overlay for retro CRT effect */
   .app::after {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: 
-      radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 30% 70%, rgba(255, 0, 200, 0.3) 0%, transparent 100%),
-      radial-gradient(1.5px 1.5px at 60% 30%, rgba(0, 200, 255, 0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 80% 80%, rgba(255, 200, 0, 0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 50% 50%, rgba(120, 0, 255, 0.3) 0%, transparent 100%),
-      radial-gradient(1.5px 1.5px at 90% 15%, rgba(255, 100, 100, 0.3) 0%, transparent 100%);
-    animation: stars-drift 20s linear infinite;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.15) 2px,
+      rgba(0, 0, 0, 0.15) 4px
+    );
     z-index: -1;
     pointer-events: none;
   }
 
-  @keyframes bg-shift {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.05); opacity: 0.9; }
-  }
-
-  @keyframes stars-drift {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-20px); }
-  }
-
   :global(button) {
-    font-family: inherit;
+    font-family: 'Press Start 2P', monospace;
     cursor: pointer;
     border: none;
-    border-radius: 14px;
+    border-radius: 4px;
     padding: 0.85rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 700;
-    transition: transform 0.12s, box-shadow 0.12s, filter 0.12s;
+    font-size: 0.7rem;
+    font-weight: 400;
+    transition: transform 0.1s, box-shadow 0.1s, filter 0.1s;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     min-height: 44px;
-    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
   }
 
   :global(button:hover:not(:disabled)) {
-    transform: scale(1.04);
-    filter: brightness(1.1);
+    transform: scale(1.03);
+    filter: brightness(1.15);
   }
 
   :global(button:active:not(:disabled)) {
     transform: scale(0.96);
-    filter: brightness(0.95);
+    filter: brightness(0.9);
   }
 
   :global(button:disabled) {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
-    filter: saturate(0.5);
+    filter: saturate(0.3);
   }
 
   :global(input) {
-    font-family: inherit;
-    border: 2px solid rgba(255, 255, 255, 0.12);
-    border-radius: 14px;
+    font-family: 'Press Start 2P', monospace;
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    border-radius: 4px;
     padding: 0.85rem 1rem;
-    font-size: 16px;
-    background: rgba(255, 255, 255, 0.06);
+    font-size: 0.75rem;
+    background: rgba(255, 0, 0, 0.05);
     color: #ffffff;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -152,12 +142,13 @@
   }
 
   :global(input:focus) {
-    border-color: rgba(200, 0, 255, 0.6);
-    box-shadow: 0 0 12px rgba(200, 0, 255, 0.2);
+    border-color: #ff0000;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
   }
 
   :global(input::placeholder) {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 0.65rem;
   }
 
   @media (max-width: 480px) {

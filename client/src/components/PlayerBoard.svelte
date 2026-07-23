@@ -41,22 +41,22 @@
   .player-card {
     position: relative;
     padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
     text-align: center;
     transition: all 0.3s;
   }
 
   .player-card.active {
-    border-color: #ff0080;
-    box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
-    background: rgba(255, 0, 128, 0.06);
+    border-color: #ff0000;
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.4);
+    background: rgba(255, 0, 0, 0.06);
   }
 
   .player-card.is-me {
-    background: rgba(0, 200, 255, 0.06);
-    border-color: rgba(0, 200, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
   .player-card.eliminated {

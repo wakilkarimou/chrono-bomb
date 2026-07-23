@@ -144,8 +144,8 @@
   }
 
   .active-indicator strong.is-me {
-    color: #ff0080;
-    text-shadow: 0 0 10px rgba(255, 0, 128, 0.6);
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
   }
 
   .game-content {
@@ -173,9 +173,10 @@
   }
 
   .btn-pass {
-    background: linear-gradient(135deg, #ff6b00, #ff0040);
+    background: #cc0000;
     color: white;
-    box-shadow: 0 3px 15px rgba(255, 107, 0, 0.35);
+    box-shadow: 0 0 12px rgba(255, 0, 0, 0.35);
+    border: 2px solid #ff0000;
     padding: 0.75rem 1.25rem;
   }
 
