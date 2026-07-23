@@ -4,89 +4,100 @@
 
   export let initialCode = '';
 
+  type Step = 'identity' | 'action';
+  let step: Step = 'identity';
+
   let nickname = '';
   let joinCode = initialCode;
-  let showRules = false;
   let selectedAvatar = '🐱';
+  let showRules = false;
 
   const avatars = ['🐱', '🦊', '🐸', '🦁', '🐼', '🐵', '🐷', '🦄', '🐲', '🦈', '🐙', '🦅'];
 
-  function createRoom() {
+  function goToAction() {
     if (!nickname.trim()) return;
+    step = 'action';
+  }
+
+  function goBack() {
+    step = 'identity';
+  }
+
+  function createRoom() {
     send({ type: 'create_room', nickname: nickname.trim(), avatar: selectedAvatar });
   }
 
   function joinRoom() {
-    if (!nickname.trim() || !joinCode.trim()) return;
+    if (!joinCode.trim() || joinCode.length !== 4) return;
     roomCode.set(joinCode.toUpperCase());
     send({ type: 'join_room', code: joinCode.toUpperCase(), nickname: nickname.trim(), avatar: selectedAvatar });
   }
 </script>
 
 <div class="home">
-  <div class="logo-section">
-    <h1 class="title">💣 Chrono-Bomb</h1>
-    <p class="subtitle">Le party game explosif !</p>
-  </div>
+  <h1 class="title">💣 Chrono-Bomb</h1>
 
   {#if showRules}
     <div class="rules-panel">
       <h3>📖 Comment jouer</h3>
       <ol>
-        <li>Crée un salon ou rejoins-en un avec un code</li>
-        <li>Une bombe est donnée à un joueur au hasard</li>
-        <li>Résous un mini-défi rapide (QCM, réflexe, pattern...)</li>
-        <li>Passe la bombe à un autre joueur avant qu'elle explose !</li>
-        <li>Un chrono secret (15-30s) tourne en arrière-plan</li>
-        <li>Quand il atteint zéro → 💥 explosion → -1 vie</li>
-        <li>3 vies par joueur — le dernier survivant gagne 🏆</li>
+        <li>Crée un salon ou rejoins avec un code</li>
+        <li>Une bombe tourne entre les joueurs</li>
+        <li>Résous un défi rapide pour la passer</li>
+        <li>Chrono secret : quand il expire → 💥 -1 vie</li>
+        <li>Dernier survivant = 🏆</li>
       </ol>
-      <button class="btn-close-rules" on:click={() => showRules = false}>Compris !</button>
+      <button class="btn-primary" on:click={() => showRules = false}>Compris !</button>
     </div>
+
+  {:else if step === 'identity'}
+    <!-- Step 1: Who are you? -->
+    <p class="step-label">Choisis ton identité</p>
+
+    <div class="identity-card">
+      <div class="avatar-preview">{selectedAvatar}</div>
+      <input
+        bind:value={nickname}
+        placeholder="Ton pseudo"
+        maxlength="16"
+        autocomplete="off"
+        on:keydown={(e) => e.key === 'Enter' && goToAction()}
+      />
+    </div>
+
+    <div class="avatar-grid">
+      {#each avatars as av}
+        <button
+          class="avatar-btn"
+          class:selected={selectedAvatar === av}
+          on:click={() => selectedAvatar = av}
+          type="button"
+        >{av}</button>
+      {/each}
+    </div>
+
+    <button class="btn-primary" on:click={goToAction} disabled={!nickname.trim() || !$connected}>
+      {#if !$connected}
+        ⏳ Connexion...
+      {:else}
+        Continuer →
+      {/if}
+    </button>
+
+    <button class="btn-link" on:click={() => showRules = true}>📖 Comment jouer ?</button>
+
   {:else}
-    <div class="form-section">
-      <div class="form-group">
-        <label for="nickname">Ton pseudo</label>
-        <input
-          id="nickname"
-          bind:value={nickname}
-          placeholder="Ex: Alex-42"
-          maxlength="16"
-          autocomplete="off"
-          on:keydown={(e) => e.key === 'Enter' && createRoom()}
-        />
-      </div>
+    <!-- Step 2: What do you want to do? -->
+    <button class="btn-back" on:click={goBack}>← {selectedAvatar} {nickname}</button>
 
-      <div class="avatar-section">
-        <label>Ton avatar</label>
-        <div class="avatar-grid">
-          {#each avatars as av}
-            <button
-              class="avatar-btn"
-              class:selected={selectedAvatar === av}
-              on:click={() => selectedAvatar = av}
-              type="button"
-            >{av}</button>
-          {/each}
-        </div>
-      </div>
+    <div class="action-buttons">
+      <button class="btn-create" on:click={createRoom}>
+        🎮 Créer un salon
+      </button>
 
-      <div class="actions">
-        <button class="btn-create" on:click={createRoom} disabled={!nickname.trim() || !$connected}>
-          {#if !$connected}
-            ⏳ Connexion...
-          {:else}
-            🎮 Créer un salon
-          {/if}
-        </button>
-
-        <div class="separator">
-          <span class="line"></span>
-          <span class="or-text">ou rejoindre</span>
-          <span class="line"></span>
-        </div>
-
-        <div class="join-group">
+      <div class="join-section">
+        <p class="join-label">Rejoindre un salon</p>
+        <div class="join-row">
           <input
             bind:value={joinCode}
             placeholder="CODE"
@@ -96,96 +107,87 @@
             on:input={() => { joinCode = joinCode.toUpperCase(); }}
             on:keydown={(e) => e.key === 'Enter' && joinRoom()}
           />
-          <button class="btn-join" on:click={joinRoom} disabled={!nickname.trim() || joinCode.length !== 4 || !$connected}>
-            🚀 Rejoindre
+          <button class="btn-join" on:click={joinRoom} disabled={joinCode.length !== 4}>
+            Rejoindre
           </button>
         </div>
       </div>
-
-      {#if !$connected}
-        <p class="connecting">⏳ Connexion au serveur en cours...</p>
-      {/if}
-
-      {#if $errorMessage}
-        <p class="error">{$errorMessage}</p>
-      {/if}
     </div>
+  {/if}
 
-    <button class="btn-rules" on:click={() => showRules = true}>
-      📖 Comment jouer ?
-    </button>
+  {#if $errorMessage}
+    <p class="error">{$errorMessage}</p>
   {/if}
 </div>
 
 <style>
   .home {
     text-align: center;
-    max-width: 420px;
+    max-width: 380px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .logo-section {
-    margin-bottom: 0.5rem;
-  }
-
-  .title {
-    font-size: 3rem;
-    margin-bottom: 0.25rem;
-    text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
-  }
-
-  .subtitle {
-    opacity: 0.7;
-    font-size: 1.1rem;
-  }
-
-  .form-section {
-    display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 1.25rem;
   }
 
-  .form-group {
-    text-align: left;
+  .title {
+    font-size: 2.5rem;
+    text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+    margin: 0;
   }
 
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    opacity: 0.8;
+  .step-label {
+    opacity: 0.6;
+    font-size: 0.9rem;
+    margin: 0;
   }
 
-  .form-group input {
+  /* Identity card */
+  .identity-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .avatar-preview {
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(168, 85, 247, 0.1);
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .identity-card input {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  /* Avatar grid */
+  .avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.4rem;
     width: 100%;
   }
 
-  .avatar-section {
-    text-align: left;
-  }
-
-  .avatar-section label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    opacity: 0.8;
-  }
-
-  .avatar-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-  }
-
   .avatar-btn {
-    font-size: 1.5rem;
-    width: 44px;
-    height: 44px;
+    font-size: 1.4rem;
+    aspect-ratio: 1;
     padding: 0;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
     border: 2px solid transparent;
     border-radius: 10px;
     display: flex;
@@ -198,51 +200,70 @@
     border-color: #a855f7;
     background: rgba(168, 85, 247, 0.15);
     transform: scale(1.1);
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
   }
 
-  .actions {
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    color: white;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    padding: 0.9rem;
+    font-size: 1.05rem;
+  }
+
+  .btn-link {
+    background: none;
+    color: rgba(240, 230, 255, 0.5);
+    font-size: 0.85rem;
+    padding: 0.4rem;
+  }
+
+  .btn-back {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.06);
+    color: #f0e6ff;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+  }
+
+  /* Action buttons */
+  .action-buttons {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 
   .btn-create {
+    width: 100%;
     background: linear-gradient(135deg, #a855f7, #7c3aed);
     color: white;
-    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    padding: 1.1rem;
+    font-size: 1.15rem;
+  }
+
+  .join-section {
     width: 100%;
-    padding: 1rem;
-    font-size: 1.1rem;
   }
 
-  .separator {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .line {
-    flex: 1;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.15);
-  }
-
-  .or-text {
+  .join-label {
     font-size: 0.85rem;
     opacity: 0.5;
-    white-space: nowrap;
+    margin-bottom: 0.6rem;
   }
 
-  .join-group {
+  .join-row {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .code-input {
     flex: 1;
     text-align: center;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 700;
     letter-spacing: 0.3rem;
     text-transform: uppercase;
@@ -251,87 +272,58 @@
   .btn-join {
     background: linear-gradient(135deg, #06b6d4, #0891b2);
     color: white;
-    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
     white-space: nowrap;
+    padding: 0.75rem 1.25rem;
   }
 
-  .btn-rules {
-    background: none;
-    color: rgba(240, 230, 255, 0.6);
-    font-size: 0.9rem;
-    padding: 0.5rem;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
-  .btn-rules:hover {
-    color: #f0e6ff;
-  }
-
-  /* Rules panel */
+  /* Rules */
   .rules-panel {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
-    padding: 1.5rem;
+    padding: 1.25rem;
     text-align: left;
+    width: 100%;
   }
 
   .rules-panel h3 {
     text-align: center;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
   }
 
   .rules-panel ol {
-    padding-left: 1.5rem;
+    padding-left: 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
-    font-size: 0.95rem;
+    gap: 0.5rem;
+    font-size: 0.9rem;
     line-height: 1.4;
     opacity: 0.85;
   }
 
-  .btn-close-rules {
-    margin-top: 1.25rem;
-    width: 100%;
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
-    color: white;
-    padding: 0.85rem;
-  }
-
   .error {
-    padding: 0.75rem;
+    width: 100%;
+    padding: 0.7rem;
     background: rgba(239, 68, 68, 0.15);
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 8px;
     color: #fca5a5;
-    font-size: 0.9rem;
-  }
-
-  .connecting {
-    font-size: 0.9rem;
-    opacity: 0.6;
-    animation: pulse 1.5s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 0.8; }
+    font-size: 0.85rem;
   }
 
   @media (max-width: 480px) {
     .title {
-      font-size: 2.2rem;
+      font-size: 2rem;
     }
 
-    .join-group {
+    .avatar-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+
+    .join-row {
       flex-direction: column;
-    }
-
-    .code-input {
-      font-size: 1.5rem;
     }
   }
 </style>
