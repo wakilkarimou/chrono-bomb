@@ -1,4 +1,4 @@
-import type { PublicChallenge, PublicGameState, PublicPlayer, UrgencyLevel } from './models';
+import type { PublicChallenge, PublicGameState, PublicPlayer, UrgencyLevel, PowerUpType } from './models';
 
 // ========== Client → Server ==========
 
@@ -50,6 +50,11 @@ export interface SendEmojiEvent {
   emoji: string;
 }
 
+export interface SendQuickChatEvent {
+  type: 'send_quick_chat';
+  message: string;
+}
+
 export type ClientEvent =
   | CreateRoomEvent
   | JoinRoomEvent
@@ -59,7 +64,8 @@ export type ClientEvent =
   | PassBombEvent
   | HeartbeatEvent
   | ReconnectEvent
-  | SendEmojiEvent;
+  | SendEmojiEvent
+  | SendQuickChatEvent;
 
 // ========== Server → Client ==========
 
@@ -159,6 +165,19 @@ export interface EmojiReceivedEvent {
   emoji: string;
 }
 
+export interface PowerUpGainedEvent {
+  type: 'power_up_gained';
+  playerId: string;
+  powerUp: PowerUpType;
+}
+
+export interface QuickChatReceivedEvent {
+  type: 'quick_chat_received';
+  playerId: string;
+  nickname: string;
+  message: string;
+}
+
 export type ServerEvent =
   | RoomCreatedEvent
   | RoomJoinedEvent
@@ -175,4 +194,6 @@ export type ServerEvent =
   | PlayerDisconnectedEvent
   | ReconnectedEvent
   | ServerErrorEvent
-  | EmojiReceivedEvent;
+  | EmojiReceivedEvent
+  | PowerUpGainedEvent
+  | QuickChatReceivedEvent;

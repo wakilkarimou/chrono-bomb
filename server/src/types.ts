@@ -1,4 +1,4 @@
-import type { ChallengeType, GameMode, PlayerStatus, RoomStatus, UrgencyLevel } from './shared';
+import type { ChallengeType, GameMode, PlayerStatus, PowerUpType, RoomStatus, UrgencyLevel } from './shared';
 
 export interface Player {
   id: string;
@@ -11,6 +11,7 @@ export interface Player {
   socketId: string | null;
   disconnectedAt: number | null;
   disconnectTimer: ReturnType<typeof setTimeout> | null;
+  powerUp: PowerUpType | null;
 }
 
 export interface WordChallengePayload {

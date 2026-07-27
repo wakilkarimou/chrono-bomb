@@ -17,9 +17,12 @@ import {
   killCounts,
   gameStats,
   showCountdown,
+  myPowerUp,
+  quickChatMessages,
 } from './stores';
 import { playSuccess, playFail, playPass, playExplosion, playReceiveBomb, playVictory, playTick, playUrgencyTick } from './audio';
 import { incrementStat } from './profile';
+import { notifyMyTurn } from './notifications';
 
 let ws: WebSocket | null = null;
 let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
@@ -155,6 +158,7 @@ function handleServerEvent(event: ServerEvent): void {
       killCounts.set({});
       gameStats.set({ bombsReceived: {}, challengesSolved: {}, fastestSolve: {}, timeHoldingBomb: {} });
       lastBombPasser = null;
+      myPowerUp.set(null);
       gameState.set({
         status: 'playing',
         activePlayerId: event.activePlayerId,
@@ -221,6 +225,7 @@ function handleServerEvent(event: ServerEvent): void {
       // Sound + vibrate when you receive the bomb
       if (event.toPlayerId === savedPlayerId) {
         playReceiveBomb();
+        notifyMyTurn();
         if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
       }
       break;
@@ -250,6 +255,11 @@ function handleServerEvent(event: ServerEvent): void {
         });
       }
       lastBombPasser = null;
+
+      // Clear power-up if shield was used (no life lost)
+      if (event.playerId === savedPlayerId) {
+        myPowerUp.set(null);
+      }
 
       // Vibrate on explosion
       if (navigator.vibrate) {
@@ -329,10 +339,24 @@ function handleServerEvent(event: ServerEvent): void {
     case 'emoji_received': {
       const emojiId = Date.now() + Math.random();
       floatingEmojis.update(list => [...list, { id: emojiId, emoji: event.emoji, nickname: event.nickname }]);
-      // Remove after animation
       setTimeout(() => {
         floatingEmojis.update(list => list.filter(e => e.id !== emojiId));
       }, 2000);
+      break;
+    }
+
+    case 'power_up_gained':
+      if (event.playerId === savedPlayerId) {
+        myPowerUp.set(event.powerUp);
+      }
+      break;
+
+    case 'quick_chat_received': {
+      const chatId = Date.now() + Math.random();
+      quickChatMessages.update(list => [...list, { id: chatId, nickname: event.nickname, message: event.message }]);
+      setTimeout(() => {
+        quickChatMessages.update(list => list.filter(m => m.id !== chatId));
+      }, 3000);
       break;
     }
   }

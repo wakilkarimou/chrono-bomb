@@ -121,6 +121,25 @@ export class GameLoop {
       state.urgency.signalTimerRef = null;
     }
 
+    // Shield protection — absorb the explosion
+    if (activePlayer.powerUp === 'shield') {
+      activePlayer.powerUp = null;
+      this.broadcast(room, {
+        type: 'bomb_exploded',
+        playerId: activePlayer.id,
+        livesRemaining: activePlayer.lives,
+        eliminated: false,
+      });
+      // Start new round without damage
+      const survivors = this.getSurvivors(room);
+      setTimeout(() => {
+        if (room.gameState.status === 'playing') {
+          this.startNewRound(room, survivors);
+        }
+      }, 2000);
+      return;
+    }
+
     activePlayer.lives -= 1;
     const eliminated = activePlayer.lives <= 0;
 

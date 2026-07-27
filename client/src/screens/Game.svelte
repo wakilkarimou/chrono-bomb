@@ -11,10 +11,20 @@
   import PlayerBoard from '../components/PlayerBoard.svelte';
   import EmojiBar from '../components/EmojiBar.svelte';
   import EmojiOverlay from '../components/EmojiOverlay.svelte';
+  import EmojiBar from '../components/EmojiBar.svelte';
+  import EmojiOverlay from '../components/EmojiOverlay.svelte';
   import BombPassAnimation from '../components/BombPassAnimation.svelte';
   import DeathScreen from '../components/DeathScreen.svelte';
   import Countdown from '../components/Countdown.svelte';
+  import QuickChat from '../components/QuickChat.svelte';
+  import PowerUpIndicator from '../components/PowerUpIndicator.svelte';
   import { playTick } from '../lib/audio';
+  import { requestNotificationPermission } from '../lib/notifications';
+  import { onMount } from 'svelte';
+
+  onMount(() => {
+    requestNotificationPermission();
+  });
 
   $: challenge = $gameState?.currentChallenge;
   $: activePlayer = $players.find(p => p.id === $gameState?.activePlayerId);
@@ -130,9 +140,11 @@
   <PlayerBoard players={$players} activePlayerId={$gameState?.activePlayerId || null} myId={$playerId} />
 
   <EmojiBar />
+  <QuickChat />
   <EmojiOverlay />
   <BombPassAnimation />
   <DeathScreen />
+  <PowerUpIndicator />
 
   {#if $showCountdown}
     <Countdown on:complete={() => { showCountdown.set(false); playTick(); }} />

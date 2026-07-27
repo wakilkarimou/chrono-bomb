@@ -33,6 +33,8 @@ export const gameStats = writable<{
 });
 
 export const showCountdown = writable<boolean>(false);
+export const myPowerUp = writable<string | null>(null);
+export const quickChatMessages = writable<{ id: number; nickname: string; message: string }[]>([]);
 
 export const isHost = derived(
   [playerId, players],

@@ -24,15 +24,19 @@
 
 <main class="app">
   <MuteButton />
-  {#if $currentScreen === 'home'}
-    <Home {initialCode} />
-  {:else if $currentScreen === 'lobby'}
-    <Lobby />
-  {:else if $currentScreen === 'game'}
-    <Game />
-  {:else if $currentScreen === 'podium'}
-    <Podium />
-  {/if}
+  {#key $currentScreen}
+    <div class="screen-transition">
+      {#if $currentScreen === 'home'}
+        <Home {initialCode} />
+      {:else if $currentScreen === 'lobby'}
+        <Lobby />
+      {:else if $currentScreen === 'game'}
+        <Game />
+      {:else if $currentScreen === 'podium'}
+        <Podium />
+      {/if}
+    </div>
+  {/key}
 </main>
 
 <style>
@@ -160,5 +164,20 @@
       padding-top: 1rem;
       justify-content: center;
     }
+  }
+
+  .screen-transition {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+    animation: screen-in 0.3s ease-out;
+  }
+
+  @keyframes screen-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>

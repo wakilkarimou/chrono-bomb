@@ -82,6 +82,9 @@ function handleEvent(socketId: string, event: ClientEvent): void {
     case 'send_emoji':
       handleSendEmoji(socketId, event.emoji);
       break;
+    case 'send_quick_chat':
+      handleQuickChat(socketId, event.message);
+      break;
   }
 }
 
@@ -151,6 +154,7 @@ function handleJoinRoom(socketId: string, code: string, nickname: string, avatar
     socketId,
     disconnectedAt: null,
     disconnectTimer: null,
+    powerUp: null,
   };
 
   room.players.set(playerId, player);
@@ -238,6 +242,14 @@ function handleSubmitChallenge(socketId: string, answer: string | number | strin
 
   if (success) {
     state.challengeResolved = true;
+
+    // 25% chance to gain a power-up
+    if (Math.random() < 0.25 && !player.powerUp) {
+      const powerUps: Array<'shield' | 'freeze' | 'random_pass'> = ['shield', 'freeze', 'random_pass'];
+      const gained = powerUps[Math.floor(Math.random() * powerUps.length)];
+      player.powerUp = gained;
+      broadcastToRoom(room, { type: 'power_up_gained', playerId: player.id, powerUp: gained });
+    }
 
     // Auto-pass after 2 seconds if player doesn't choose
     if (state.passTimerRef) clearTimeout(state.passTimerRef);
@@ -403,6 +415,24 @@ function removePlayerFromRoom(room: Room, player: Player): void {
     type: 'player_left',
     playerId: player.id,
     newHostId,
+  });
+}
+
+const ALLOWED_QUICK_CHATS = ['Facile', 'Noooo', 'GG', 'Encore !', 'Vite !', 'Rip'];
+
+function handleQuickChat(socketId: string, message: string): void {
+  if (!ALLOWED_QUICK_CHATS.includes(message)) return;
+
+  const found = roomStore.findPlayerRoom(socketId);
+  if (!found) return;
+
+  const { room, player } = found;
+
+  broadcastToRoom(room, {
+    type: 'quick_chat_received',
+    playerId: player.id,
+    nickname: player.nickname,
+    message,
   });
 }
 

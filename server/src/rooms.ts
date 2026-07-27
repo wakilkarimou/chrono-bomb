@@ -31,6 +31,7 @@ export class RoomStore {
       socketId,
       disconnectedAt: null,
       disconnectTimer: null,
+      powerUp: null,
     };
 
     const gameState: GameState = {
