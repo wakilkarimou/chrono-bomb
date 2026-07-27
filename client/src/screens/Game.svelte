@@ -1,6 +1,6 @@
 <script lang="ts">
   import { send } from '../lib/ws-client';
-  import { players, playerId, gameState, isActivePlayer, urgencyLevel, challengeResolved, alivePlayers, explosionEvent } from '../lib/stores';
+  import { players, playerId, gameState, isActivePlayer, urgencyLevel, challengeResolved, alivePlayers, explosionEvent, showCountdown } from '../lib/stores';
   import WordChallenge from '../components/WordChallenge.svelte';
   import ReflexChallenge from '../components/ReflexChallenge.svelte';
   import PatternChallenge from '../components/PatternChallenge.svelte';
@@ -13,6 +13,8 @@
   import EmojiOverlay from '../components/EmojiOverlay.svelte';
   import BombPassAnimation from '../components/BombPassAnimation.svelte';
   import DeathScreen from '../components/DeathScreen.svelte';
+  import Countdown from '../components/Countdown.svelte';
+  import { playTick } from '../lib/audio';
 
   $: challenge = $gameState?.currentChallenge;
   $: activePlayer = $players.find(p => p.id === $gameState?.activePlayerId);
@@ -131,6 +133,10 @@
   <EmojiOverlay />
   <BombPassAnimation />
   <DeathScreen />
+
+  {#if $showCountdown}
+    <Countdown on:complete={() => { showCountdown.set(false); playTick(); }} />
+  {/if}
 
   {#if $explosionEvent}
     <div class="explosion-overlay">

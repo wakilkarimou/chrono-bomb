@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { send, connected } from '../lib/ws-client';
   import { errorMessage, roomCode } from '../lib/stores';
   import { AVATARS } from '../lib/avatars';
   import Avatar from '../components/Avatar.svelte';
+  import { loadProfile, saveProfile } from '../lib/profile';
   import type { GameMode } from '../shared';
 
   export let initialCode = '';
@@ -15,6 +17,17 @@
   let selectedAvatar = 'skull';
   let selectedMode: GameMode = 'classic';
   let showRules = false;
+  let profileStats = { gamesPlayed: 0, wins: 0 };
+
+  // Load saved profile
+  onMount(() => {
+    const profile = loadProfile();
+    if (profile) {
+      nickname = profile.nickname;
+      selectedAvatar = profile.avatar;
+      profileStats = { gamesPlayed: profile.gamesPlayed, wins: profile.wins };
+    }
+  });
 
   const modes: { id: GameMode; name: string; icon: string; desc: string }[] = [
     { id: 'classic', name: 'CLASSIQUE', icon: '💣', desc: '3 vies, chrono 15-30s. Le mode standard pour tous.' },
@@ -24,6 +37,7 @@
 
   function goToAction() {
     if (!nickname.trim()) return;
+    saveProfile({ nickname: nickname.trim(), avatar: selectedAvatar });
     step = 'action';
   }
 
@@ -102,6 +116,10 @@
     </button>
 
     <button class="btn-link" on:click={() => showRules = true}>REGLES DU JEU</button>
+
+    {#if profileStats.gamesPlayed > 0}
+      <p class="profile-stats">{profileStats.wins}W - {profileStats.gamesPlayed - profileStats.wins}L</p>
+    {/if}
 
   {:else if step === 'action'}
     <button class="btn-back" on:click={goBack}>
@@ -435,6 +453,12 @@
     border-radius: 4px;
     color: #ff6666;
     font-size: 0.5rem;
+  }
+
+  .profile-stats {
+    font-size: 0.45rem;
+    opacity: 0.4;
+    margin: 0;
   }
 
   @media (max-width: 480px) {

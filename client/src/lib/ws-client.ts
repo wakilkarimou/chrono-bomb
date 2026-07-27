@@ -15,7 +15,11 @@ import {
   bombPassEvent,
   deathScreen,
   killCounts,
+  gameStats,
+  showCountdown,
 } from './stores';
+import { playSuccess, playFail, playPass, playExplosion, playReceiveBomb, playVictory, playTick, playUrgencyTick } from './audio';
+import { incrementStat } from './profile';
 
 let ws: WebSocket | null = null;
 let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
@@ -149,6 +153,7 @@ function handleServerEvent(event: ServerEvent): void {
     case 'game_started':
       players.set(event.players);
       killCounts.set({});
+      gameStats.set({ bombsReceived: {}, challengesSolved: {}, fastestSolve: {}, timeHoldingBomb: {} });
       lastBombPasser = null;
       gameState.set({
         status: 'playing',
@@ -159,7 +164,9 @@ function handleServerEvent(event: ServerEvent): void {
         challengeResolved: false,
       });
       urgencyLevel.set('low');
+      showCountdown.set(true);
       currentScreen.set('game');
+      incrementStat('gamesPlayed');
       break;
 
     case 'challenge_assigned':
@@ -171,6 +178,15 @@ function handleServerEvent(event: ServerEvent): void {
       if (event.success) {
         challengeResolved.set(true);
         gameState.update(s => s ? { ...s, challengeResolved: true } : s);
+        playSuccess();
+        // Track stat
+        gameStats.update(s => {
+          const cs = { ...s.challengesSolved };
+          cs[event.playerId] = (cs[event.playerId] || 0) + 1;
+          return { ...s, challengesSolved: cs };
+        });
+      } else {
+        playFail();
       }
       break;
 
@@ -191,17 +207,28 @@ function handleServerEvent(event: ServerEvent): void {
       // Track last passer for kill counting
       lastBombPasser = event.fromPlayerId;
 
+      // Track bombs received
+      gameStats.update(s => {
+        const br = { ...s.bombsReceived };
+        br[event.toPlayerId] = (br[event.toPlayerId] || 0) + 1;
+        return { ...s, bombsReceived: br };
+      });
+
+      playPass();
       gameState.update(s => s ? { ...s, activePlayerId: event.toPlayerId, challengeResolved: false } : s);
       challengeResolved.set(false);
-      // Vibrate when you receive the bomb
-      if (event.toPlayerId === savedPlayerId && navigator.vibrate) {
-        navigator.vibrate([50, 30, 50]);
+
+      // Sound + vibrate when you receive the bomb
+      if (event.toPlayerId === savedPlayerId) {
+        playReceiveBomb();
+        if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
       }
       break;
     }
 
     case 'urgency_signal':
       urgencyLevel.set(event.level);
+      playUrgencyTick(event.level);
       break;
 
     case 'bomb_exploded': {
@@ -211,6 +238,8 @@ function handleServerEvent(event: ServerEvent): void {
           ? { ...pl, lives: event.livesRemaining, status: event.eliminated ? 'spectator' : pl.status }
           : pl
       ));
+
+      playExplosion();
 
       // Count kill for the last passer
       if (lastBombPasser && lastBombPasser !== event.playerId) {
@@ -267,6 +296,11 @@ function handleServerEvent(event: ServerEvent): void {
       rankings.set(event.rankings);
       gameState.update(s => s ? { ...s, status: 'finished' } : s);
       currentScreen.set('podium');
+      // Victory sound + stats
+      if (event.winnerId === savedPlayerId) {
+        playVictory();
+        incrementStat('wins');
+      }
       break;
 
     case 'player_disconnected':

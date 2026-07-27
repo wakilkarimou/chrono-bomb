@@ -6,6 +6,7 @@
   import Lobby from './screens/Lobby.svelte';
   import Game from './screens/Game.svelte';
   import Podium from './screens/Podium.svelte';
+  import MuteButton from './components/MuteButton.svelte';
 
   // Extract ?code=XXXX from URL to pre-fill join code
   let initialCode = '';
@@ -22,6 +23,7 @@
 </script>
 
 <main class="app">
+  <MuteButton />
   {#if $currentScreen === 'home'}
     <Home {initialCode} />
   {:else if $currentScreen === 'lobby'}

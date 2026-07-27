@@ -19,6 +19,21 @@ export const bombPassEvent = writable<{ fromNickname: string; fromAvatar: string
 export const deathScreen = writable<{ nickname: string; avatar: string; position: number } | null>(null);
 export const killCounts = writable<Record<string, number>>({}); // playerId → number of "assists"
 
+// Game stats tracked during play
+export const gameStats = writable<{
+  bombsReceived: Record<string, number>;
+  challengesSolved: Record<string, number>;
+  fastestSolve: Record<string, number>; // ms
+  timeHoldingBomb: Record<string, number>; // ms
+}>({
+  bombsReceived: {},
+  challengesSolved: {},
+  fastestSolve: {},
+  timeHoldingBomb: {},
+});
+
+export const showCountdown = writable<boolean>(false);
+
 export const isHost = derived(
   [playerId, players],
   ([$playerId, $players]) => $players.find(p => p.id === $playerId)?.isHost ?? false

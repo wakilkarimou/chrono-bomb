@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { rankings, playerId, currentScreen, gameState, players, roomCode, isHost, killCounts } from '../lib/stores';
+  import { rankings, playerId, currentScreen, gameState, players, roomCode, isHost, killCounts, gameStats } from '../lib/stores';
   import { send } from '../lib/ws-client';
   import Confetti from '../components/Confetti.svelte';
+  import { loadProfile } from '../lib/profile';
 
   $: sorted = [...$rankings].sort((a, b) => a.position - b.position);
   $: myRank = sorted.find(e => e.playerId === $playerId);
@@ -65,6 +66,28 @@
         {/if}
       </div>
     {/each}
+  </div>
+
+  <!-- Game Stats -->
+  <div class="stats-section">
+    <h3>STATS</h3>
+    <div class="stats-grid">
+      {#each sorted.slice(0, 4) as entry}
+        {@const kills = $killCounts[entry.playerId] || 0}
+        {@const challenges = $gameStats.challengesSolved[entry.playerId] || 0}
+        {@const bombs = $gameStats.bombsReceived[entry.playerId] || 0}
+        {#if kills > 0 || challenges > 0}
+          <div class="stat-row">
+            <span class="stat-name">{entry.nickname}</span>
+            <span class="stat-values">
+              {#if kills > 0}<span class="stat-badge kill">🎯{kills}</span>{/if}
+              {#if challenges > 0}<span class="stat-badge solve">✓{challenges}</span>{/if}
+              {#if bombs > 0}<span class="stat-badge bomb">💣{bombs}</span>{/if}
+            </span>
+          </div>
+        {/if}
+      {/each}
+    </div>
   </div>
 
   <div class="actions">
@@ -184,6 +207,53 @@
     gap: 0.6rem;
     margin-top: 0.5rem;
   }
+
+  .stats-section {
+    text-align: left;
+  }
+
+  .stats-section h3 {
+    font-size: 0.5rem;
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+  }
+
+  .stat-name {
+    font-size: 0.4rem;
+    opacity: 0.7;
+  }
+
+  .stat-values {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .stat-badge {
+    font-size: 0.4rem;
+    padding: 0.15rem 0.3rem;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .stat-badge.kill { color: #ff4444; }
+  .stat-badge.solve { color: #4ade80; }
+  .stat-badge.bomb { color: #fb923c; }
 
   .btn-play-again {
     background: #cc0000;
